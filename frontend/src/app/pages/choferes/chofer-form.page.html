@@ -1,0 +1,120 @@
+<ion-header [translucent]="true">
+  <ion-toolbar color="primary">
+    <ion-buttons slot="start">
+      <ion-button (click)="cancelar()">
+        <ion-icon name="close"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+    <ion-title>{{ isEditMode ? 'Editar Chofer' : 'Nuevo Chofer' }}</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="guardar()" [disabled]="loading || choferForm.invalid">
+        <ion-icon name="checkmark"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <div class="ion-padding" *ngIf="loading">
+    <ion-spinner></ion-spinner>
+    <p>{{ isEditMode ? 'Cargando datos...' : 'Guardando...' }}</p>
+  </div>
+
+  <form [formGroup]="choferForm" *ngIf="!loading">
+    <ion-card>
+      <ion-card-header>
+        <ion-card-title>Información Personal</ion-card-title>
+      </ion-card-header>
+      <ion-card-content>
+        <ion-item>
+          <ion-label position="stacked">Cliente</ion-label>
+          <ion-select formControlName="cliente_id" placeholder="Seleccione un cliente (opcional)">
+            <ion-select-option [value]="null">Sin asignar</ion-select-option>
+            <ion-select-option *ngFor="let cliente of clientes" [value]="cliente.id">
+              {{ cliente.nombre }}
+            </ion-select-option>
+          </ion-select>
+        </ion-item>
+
+        <ion-item>
+          <ion-label position="stacked">Placa Principal</ion-label>
+          <ion-select formControlName="placa_principal_id" placeholder="Seleccione placa (opcional)">
+            <ion-select-option [value]="null">Sin asignar</ion-select-option>
+            <ion-select-option *ngFor="let placa of placas" [value]="placa.id">
+              {{ placa.numero_placa }} - {{ placa.marca }} {{ placa.modelo }}
+            </ion-select-option>
+          </ion-select>
+        </ion-item>
+
+        <ion-item [class.input-invalid]="isFieldInvalid('nombre')">
+          <ion-label position="stacked">Nombre Completo <ion-text color="danger">*</ion-text></ion-label>
+          <ion-input 
+            formControlName="nombre" 
+            placeholder="Nombres y apellidos"
+            type="text"
+          ></ion-input>
+          <ion-note slot="error" *ngIf="getErrorMessage('nombre')">
+            {{ getErrorMessage('nombre') }}
+          </ion-note>
+        </ion-item>
+
+        <ion-item [class.input-invalid]="isFieldInvalid('dni')">
+          <ion-label position="stacked">DNI <ion-text color="danger">*</ion-text></ion-label>
+          <ion-input 
+            formControlName="dni" 
+            placeholder="8 dígitos"
+            type="tel"
+            maxlength="8"
+          ></ion-input>
+          <ion-note slot="error" *ngIf="getErrorMessage('dni')">
+            {{ getErrorMessage('dni') }}
+          </ion-note>
+        </ion-item>
+
+        <ion-item [class.input-invalid]="isFieldInvalid('licencia')">
+          <ion-label position="stacked">Número de Licencia</ion-label>
+          <ion-input 
+            formControlName="licencia" 
+            placeholder="Ej: A-IIb, A-IIIb"
+            type="text"
+          ></ion-input>
+          <ion-note slot="error" *ngIf="getErrorMessage('licencia')">
+            {{ getErrorMessage('licencia') }}
+          </ion-note>
+        </ion-item>
+
+        <ion-item [class.input-invalid]="isFieldInvalid('telefono')">
+          <ion-label position="stacked">Teléfono</ion-label>
+          <ion-input 
+            formControlName="telefono" 
+            placeholder="Ej: 987654321"
+            type="tel"
+          ></ion-input>
+        </ion-item>
+      </ion-card-content>
+    </ion-card>
+
+    <ion-card>
+      <ion-card-header>
+        <ion-card-title>Estado</ion-card-title>
+      </ion-card-header>
+      <ion-card-content>
+        <ion-item>
+          <ion-label>Chofer Activo</ion-label>
+          <ion-checkbox formControlName="activo" slot="end"></ion-checkbox>
+        </ion-item>
+      </ion-card-content>
+    </ion-card>
+
+    <div class="ion-padding">
+      <ion-button expand="block" (click)="guardar()" [disabled]="loading || choferForm.invalid">
+        <ion-icon name="save-outline" slot="start"></ion-icon>
+        {{ isEditMode ? 'Actualizar Chofer' : 'Crear Chofer' }}
+      </ion-button>
+      <ion-button expand="block" fill="outline" (click)="cancelar()" [disabled]="loading">
+        <ion-icon name="close-outline" slot="start"></ion-icon>
+        Cancelar
+      </ion-button>
+    </div>
+  </form>
+</ion-content>

@@ -1,0 +1,109 @@
+<ion-header>
+  <ion-toolbar color="primary">
+    <ion-buttons slot="start">
+      <ion-button (click)="cancelar()">
+        <ion-icon name="arrow-back-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+    <ion-title>{{ isEditMode ? 'Editar Jaba' : 'Nueva Jaba' }}</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <form [formGroup]="descripcionForm" (ngSubmit)="guardar()">
+    <ion-card>
+      <ion-card-header>
+        <ion-card-title>Datos de la Jaba</ion-card-title>
+      </ion-card-header>
+
+      <ion-card-content>
+        <!-- Cliente (obligatorio) -->
+        <ion-item [class.input-invalid]="isFieldInvalid('cliente_id')">
+          <ion-label position="stacked">Cliente *</ion-label>
+          <ion-select formControlName="cliente_id" placeholder="Seleccione un cliente">
+            <ion-select-option *ngFor="let c of clientes" [value]="c.id">{{ c.nombre }}</ion-select-option>
+          </ion-select>
+        </ion-item>
+        <ion-note color="danger" *ngIf="getErrorMessage('cliente_id')">
+          {{ getErrorMessage('cliente_id') }}
+        </ion-note>
+
+        <!-- Código -->
+        <ion-item>
+          <ion-label position="stacked">Código *</ion-label>
+          <ion-input
+            formControlName="codigo"
+            placeholder="Ej: J-001, P-001"
+            maxlength="20"
+            autocapitalize="characters"
+          ></ion-input>
+        </ion-item>
+        <ion-note color="danger" *ngIf="getErrorMessage('codigo')">
+          {{ getErrorMessage('codigo') }}
+        </ion-note>
+
+        <!-- Descripción -->
+        <ion-item>
+          <ion-label position="stacked">Descripción *</ion-label>
+          <ion-textarea
+            formControlName="descripcion"
+            placeholder="Descripción detallada del item"
+            rows="3"
+            maxlength="255"
+          ></ion-textarea>
+        </ion-item>
+        <ion-note color="danger" *ngIf="getErrorMessage('descripcion')">
+          {{ getErrorMessage('descripcion') }}
+        </ion-note>
+
+        <!-- Color -->
+        <ion-item>
+          <ion-label position="stacked">Color</ion-label>
+          <ion-select formControlName="color" placeholder="Seleccione un color">
+            <ion-select-option *ngFor="let color of colores" [value]="color">
+              {{ color }}
+            </ion-select-option>
+          </ion-select>
+        </ion-item>
+
+        <!-- Material -->
+        <ion-item>
+          <ion-label position="stacked">Material</ion-label>
+          <ion-select formControlName="material" placeholder="Seleccione un material">
+            <ion-select-option *ngFor="let material of materiales" [value]="material">
+              {{ material }}
+            </ion-select-option>
+          </ion-select>
+        </ion-item>
+
+        <!-- Capacidad -->
+        <ion-item>
+          <ion-label position="stacked">Capacidad (kg)</ion-label>
+          <ion-input
+            formControlName="capacidad"
+            type="number"
+            placeholder="Ej: 25"
+            min="0"
+          ></ion-input>
+        </ion-item>
+
+        <!-- Estado Activo -->
+        <ion-item>
+          <ion-label>Activo</ion-label>
+          <ion-checkbox formControlName="activo" slot="end"></ion-checkbox>
+        </ion-item>
+      </ion-card-content>
+    </ion-card>
+
+    <!-- Botones de Acción -->
+    <div class="button-container">
+      <ion-button expand="block" color="medium" (click)="cancelar()" [disabled]="loading">
+        Cancelar
+      </ion-button>
+      <ion-button expand="block" color="primary" type="submit" [disabled]="loading">
+        <ion-spinner *ngIf="loading" name="crescent"></ion-spinner>
+        <span *ngIf="!loading">{{ isEditMode ? 'Actualizar' : 'Guardar' }}</span>
+      </ion-button>
+    </div>
+  </form>
+</ion-content>

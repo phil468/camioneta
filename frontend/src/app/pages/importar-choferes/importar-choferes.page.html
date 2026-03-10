@@ -1,0 +1,114 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/configuracion"></ion-back-button>
+    </ion-buttons>
+    <ion-title>Importar Choferes</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <ion-card>
+    <ion-card-header>
+      <ion-card-title>Instrucciones</ion-card-title>
+    </ion-card-header>
+    <ion-card-content>
+      <p>
+        Suba un archivo Excel (.xlsx, .xls) o CSV con las siguientes columnas:
+      </p>
+      <ul>
+        <li><strong>CLIENTE</strong>: Nombre del cliente</li>
+        <li><strong>CHOFER</strong>: Nombre completo del chofer</li>
+        <li><strong>DNI</strong>: DNI del chofer (8 dígitos)</li>
+        <li><strong>PLACA</strong>: Número de placa del vehículo</li>
+      </ul>
+      <ion-note color="medium">
+        Si el cliente o la placa no existen, se crearán automáticamente. Si el
+        chofer ya existe (mismo DNI), se actualizará.
+      </ion-note>
+    </ion-card-content>
+  </ion-card>
+
+  <ion-card>
+    <ion-card-header>
+      <ion-card-title>Seleccionar Archivo</ion-card-title>
+    </ion-card-header>
+    <ion-card-content>
+      <input
+        type="file"
+        id="fileInput"
+        accept=".xlsx,.xls,.csv"
+        (change)="onFileSelected($event)"
+        style="margin-bottom: 16px"
+      />
+
+      <div *ngIf="selectedFile" style="margin: 16px 0">
+        <ion-item>
+          <ion-icon name="document-text-outline" slot="start"></ion-icon>
+          <ion-label>
+            <h3>Archivo seleccionado</h3>
+            <p>{{ selectedFile.name }}</p>
+            <p>{{ (selectedFile.size / 1024).toFixed(2) }} KB</p>
+          </ion-label>
+        </ion-item>
+      </div>
+
+      <div class="button-group">
+        <ion-button expand="block" (click)="descargarPlantilla()" fill="outline">
+          <ion-icon name="cloud-download-outline" slot="start"></ion-icon>
+          Descargar Plantilla
+        </ion-button>
+
+        <ion-button
+          expand="block"
+          (click)="importar()"
+          [disabled]="!selectedFile || loading"
+        >
+          <ion-spinner *ngIf="loading" slot="start"></ion-spinner>
+          <ion-icon
+            *ngIf="!loading"
+            name="cloud-upload-outline"
+            slot="start"
+          ></ion-icon>
+          {{ loading ? 'Importando...' : 'Importar Choferes' }}
+        </ion-button>
+      </div>
+    </ion-card-content>
+  </ion-card>
+
+  <ion-card *ngIf="resultado">
+    <ion-card-header>
+      <ion-card-title
+        [color]="resultado.success ? 'success' : 'danger'"
+      >
+        Resultado de la Importación
+      </ion-card-title>
+    </ion-card-header>
+    <ion-card-content>
+      <ion-list>
+        <ion-item *ngIf="resultado.imported !== undefined">
+          <ion-label>
+            <h3>Choferes nuevos</h3>
+            <p>{{ resultado.imported }}</p>
+          </ion-label>
+        </ion-item>
+
+        <ion-item *ngIf="resultado.updated !== undefined">
+          <ion-label>
+            <h3>Choferes actualizados</h3>
+            <p>{{ resultado.updated }}</p>
+          </ion-label>
+        </ion-item>
+
+        <ion-item *ngIf="resultado.errors && resultado.errors.length > 0" color="warning">
+          <ion-label>
+            <h3>Errores ({{ resultado.errors.length }})</h3>
+            <div *ngFor="let error of resultado.errors">
+              <p>{{ error }}</p>
+            </div>
+          </ion-label>
+        </ion-item>
+      </ion-list>
+    </ion-card-content>
+  </ion-card>
+</ion-content>

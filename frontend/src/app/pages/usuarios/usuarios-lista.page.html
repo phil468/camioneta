@@ -1,0 +1,89 @@
+<ion-header>
+  <ion-toolbar color="primary">
+    <ion-buttons slot="start">
+      <ion-button (click)="volver()">
+        <ion-icon name="arrow-back"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+    <ion-title>Usuarios</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="nuevoUsuario()">
+        <ion-icon name="add"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+
+  <ion-toolbar>
+    <ion-searchbar
+      [(ngModel)]="searchTerm"
+      (ionInput)="buscar($event)"
+      placeholder="Buscar por nombre o email..."
+      animated
+    ></ion-searchbar>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <ion-refresher slot="fixed" (ionRefresh)="doRefresh($event)">
+    <ion-refresher-content></ion-refresher-content>
+  </ion-refresher>
+
+  <ion-list *ngIf="!loading && usuariosFiltrados.length > 0">
+    <ion-item *ngFor="let usuario of usuariosFiltrados">
+      <ion-avatar slot="start" (click)="editarUsuario(usuario.id)">
+        <img [src]="usuario.avatar || 'assets/avatar-default.svg'" [alt]="usuario.name" />
+      </ion-avatar>
+
+      <ion-label (click)="editarUsuario(usuario.id)">
+        <h2><strong>{{ usuario.name }}</strong></h2>
+        <p>{{ usuario.email }}</p>
+        <p *ngIf="usuario.role">
+          <ion-icon name="shield-checkmark-outline" color="tertiary"></ion-icon>
+          {{ usuario.role.nombre }}
+        </p>
+        <p *ngIf="usuario.microsoft_id">
+          <ion-icon name="logo-microsoft" color="primary"></ion-icon>
+          Conectado con Microsoft
+        </p>
+      </ion-label>
+
+      <ion-badge [color]="usuario.activo ? 'success' : 'danger'" slot="end">
+        {{ usuario.activo ? 'Activo' : 'Inactivo' }}
+      </ion-badge>
+
+      <ion-button 
+        slot="end" 
+        fill="clear" 
+        [color]="usuario.activo ? 'warning' : 'success'"
+        (click)="toggleEstado(usuario)">
+        <ion-icon 
+          slot="icon-only" 
+          [name]="usuario.activo ? 'ban-outline' : 'checkmark-outline'"
+        ></ion-icon>
+      </ion-button>
+
+      <ion-button 
+        slot="end" 
+        fill="clear" 
+        color="danger" 
+        (click)="eliminarUsuario(usuario)">
+        <ion-icon slot="icon-only" name="trash-outline"></ion-icon>
+      </ion-button>
+    </ion-item>
+  </ion-list>
+
+  <div *ngIf="!loading && usuariosFiltrados.length === 0" class="empty-state">
+    <ion-icon name="person-outline" style="font-size: 64px; color: var(--ion-color-medium);"></ion-icon>
+    <h2>No hay usuarios</h2>
+    <p>Agrega el primer usuario para comenzar</p>
+    <ion-button (click)="nuevoUsuario()">
+      <ion-icon name="add" slot="start"></ion-icon>
+      Nuevo Usuario
+    </ion-button>
+  </div>
+
+  <div *ngIf="loading" style="text-align: center; padding: 20px;">
+    <ion-spinner></ion-spinner>
+    <p>Cargando usuarios...</p>
+  </div>
+</ion-content>

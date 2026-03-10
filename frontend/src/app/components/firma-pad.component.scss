@@ -1,0 +1,57 @@
+.firma-container {
+  padding: 20px;
+}
+
+.firma-header {
+  text-align: center;
+  margin-bottom: 20px;
+  
+  h3 {
+    margin: 0 0 8px 0;
+    color: var(--ion-color-primary);
+  }
+  
+  p {
+    margin: 0;
+    color: var(--ion-color-medium);
+    font-size: 0.9rem;
+  }
+}
+
+.canvas-wrapper {
+  border: 2px solid var(--ion-color-medium);
+  border-radius: 8px;
+  background: #ffffff;
+  margin-bottom: 20px;
+  overflow: hidden;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.firma-canvas {
+  width: 100%;
+  height: 200px;
+  display: block;
+  touch-action: none;
+  cursor: crosshair;
+  background: #ffffff;
+}
+
+.firma-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  
+  ion-button:last-child {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (max-width: 576px) {
+  .firma-actions {
+    grid-template-columns: 1fr;
+    
+    ion-button:last-child {
+      grid-column: 1;
+    }
+  }
+}

@@ -1,0 +1,52 @@
+<ion-app>
+  <ion-menu contentId="main-content" type="overlay" [disabled]="isLoginPage">
+    <ion-header>
+      <ion-toolbar color="primary">
+        <ion-title>Menú</ion-title>
+      </ion-toolbar>
+    </ion-header>
+    <ion-content>
+      <!-- User Info -->
+      <div class="user-info" *ngIf="user">
+        <ion-avatar>
+          <img [src]="user.avatar || 'assets/avatar-default.svg'" alt="Avatar" />
+        </ion-avatar>
+        <h2>{{ user.name }}</h2>
+        <ion-note>{{ user.email }}</ion-note>
+      </div>
+
+      <!-- Menu Items -->
+      <ion-list>
+        <ion-menu-toggle auto-hide="false" *ngFor="let item of menuItems">
+          <ion-item
+            [routerLink]="item.url"
+            routerLinkActive="active-item"
+            [detail]="false"
+            button
+          >
+            <ion-icon [name]="item.icon" slot="start"></ion-icon>
+            <ion-label>{{ item.title }}</ion-label>
+          </ion-item>
+        </ion-menu-toggle>
+
+        <!-- Verificar versión -->
+        <ion-menu-toggle auto-hide="false">
+          <ion-item button (click)="checkVersion()" lines="none" class="version-item">
+            <ion-icon name="cloud-download" slot="start" color="tertiary"></ion-icon>
+            <ion-label color="tertiary">Verificar versión</ion-label>
+          </ion-item>
+        </ion-menu-toggle>
+
+        <!-- Logout -->
+        <ion-menu-toggle auto-hide="false">
+          <ion-item button (click)="logout()" lines="none" class="logout-item">
+            <ion-icon name="log-out" slot="start" color="danger"></ion-icon>
+            <ion-label color="danger">Cerrar sesión</ion-label>
+          </ion-item>
+        </ion-menu-toggle>
+      </ion-list>
+    </ion-content>
+  </ion-menu>
+
+  <ion-router-outlet id="main-content"></ion-router-outlet>
+</ion-app>

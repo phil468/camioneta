@@ -1,0 +1,27 @@
+<div class="firma-container">
+  <div class="firma-header">
+    <h3>Firma Digital</h3>
+    <p>Dibuje su firma en el espacio siguiente:</p>
+  </div>
+
+  <div class="canvas-wrapper">
+    <canvas #canvas class="firma-canvas"></canvas>
+  </div>
+
+  <div class="firma-actions">
+    <ion-button expand="block" fill="outline" (click)="limpiar()">
+      <ion-icon slot="start" name="refresh-outline"></ion-icon>
+      Limpiar
+    </ion-button>
+    
+    <ion-button expand="block" color="danger" fill="outline" (click)="cancelar()">
+      <ion-icon slot="start" name="close-outline"></ion-icon>
+      Cancelar
+    </ion-button>
+    
+    <ion-button expand="block" color="primary" (click)="guardar()">
+      <ion-icon slot="start" name="checkmark-outline"></ion-icon>
+      Guardar Firma
+    </ion-button>
+  </div>
+</div>

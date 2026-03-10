@@ -1,0 +1,111 @@
+.login-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  max-width: 500px;
+  margin: 0 auto;
+}
+
+.login-header {
+  text-align: center;
+  margin-bottom: 32px;
+
+  ion-icon {
+    font-size: 80px;
+    margin-bottom: 16px;
+  }
+
+  h1 {
+    font-size: 28px;
+    font-weight: bold;
+    margin: 8px 0;
+    color: var(--ion-color-primary);
+  }
+
+  p {
+    font-size: 16px;
+    color: var(--ion-color-medium);
+    margin: 4px 0;
+  }
+}
+
+ion-card {
+  width: 100%;
+  margin: 0;
+}
+
+ion-item {
+  margin-bottom: 8px;
+}
+
+ion-note {
+  padding-left: 16px;
+  font-size: 12px;
+  margin-bottom: 8px;
+  display: block;
+}
+
+.divider {
+  display: flex;
+  align-items: center;
+  margin: 24px 0;
+  
+  &::before,
+  &::after {
+    content: '';
+    flex: 1;
+    border-bottom: 1px solid var(--ion-color-medium);
+  }
+  
+  span {
+    padding: 0 16px;
+    color: var(--ion-color-medium);
+    font-size: 14px;
+  }
+}
+
+.microsoft-button {
+  --background: #2f2f2f;
+  --color: white;
+  
+  &:hover {
+    --background: #1f1f1f;
+  }
+}
+
+.register-link {
+  text-align: center;
+  margin-top: 24px;
+
+  p {
+    font-size: 14px;
+    color: var(--ion-color-medium);
+    
+    a {
+      color: var(--ion-color-primary);
+      text-decoration: none;
+      font-weight: 500;
+      cursor: pointer;
+      
+      &:hover {
+        text-decoration: underline;
+      }
+    }
+  }
+}
+
+.download-apk-button {
+  --color: var(--ion-color-primary);
+  font-size: 14px;
+  text-transform: none;
+  
+  &:hover {
+    --color: var(--ion-color-primary-shade);
+  }
+  
+  ion-icon {
+    font-size: 20px;
+  }
+}

@@ -1,0 +1,25 @@
+ion-item {
+  --padding-start: 16px;
+}
+
+ion-avatar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+ion-badge {
+  font-size: 10px;
+  padding: 4px 8px;
+}
+
+ion-label p ion-icon {
+  font-size: 14px;
+  margin-right: 4px;
+  vertical-align: middle;
+}
+
+.ion-padding ion-spinner {
+  display: block;
+  margin: 20px auto;
+}

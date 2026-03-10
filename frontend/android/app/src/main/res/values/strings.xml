@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Jabas y Parihuelas</string>
+    <string name="title_activity_main">Jabas y Parihuelas</string>
+    <string name="package_name">pe.vanguardfresh.jabasyparihuelas</string>
+    <string name="custom_url_scheme">pe.vanguardfresh.jabasyparihuelas</string>
+</resources>

@@ -1,0 +1,159 @@
+<ion-content class="ion-padding">
+  <div class="login-container">
+    <div class="login-header">
+      <img src="assets/images/Logotipo Vertical - Grupo Vanguard Internacional.png" alt="Grupo Vanguard Internacional" style="max-width: 300px; margin-bottom: 20px;">
+      <h1>Control de Alquiler <br> de Jabas y Parihuelas</h1>
+      <!-- <p>Jabas y Parihuelas</p> -->
+    </div>
+
+    <!-- Login Form -->
+    <ion-card *ngIf="!showRegister">
+      <ion-card-header>
+        <ion-card-title>Iniciar Sesión</ion-card-title>
+      </ion-card-header>
+
+      <ion-card-content>                
+
+        <ion-button 
+          expand="block" 
+          fill="outline" 
+          (click)="loginWithMicrosoft()"
+          class="microsoft-button"
+        >
+          <ion-icon name="logo-microsoft" slot="start"></ion-icon>
+          Continuar con Microsoft
+        </ion-button>
+
+        <div class="divider">
+          <span>O</span>
+        </div>
+
+        <form [formGroup]="loginForm" (ngSubmit)="login()">
+          <ion-item>
+            <ion-label position="stacked">Email</ion-label>
+            <ion-input
+              formControlName="email"
+              type="email"
+              placeholder="tu@email.com"
+            ></ion-input>
+          </ion-item>
+          <ion-note color="danger" *ngIf="getErrorMessage(loginForm, 'email')">
+            {{ getErrorMessage(loginForm, 'email') }}
+          </ion-note>
+
+          <ion-item>
+            <ion-label position="stacked">Contraseña</ion-label>
+            <ion-input
+              formControlName="password"
+              type="password"
+              placeholder="••••••••"
+            ></ion-input>
+          </ion-item>
+          <ion-note color="danger" *ngIf="getErrorMessage(loginForm, 'password')">
+            {{ getErrorMessage(loginForm, 'password') }}
+          </ion-note>
+
+          <ion-button expand="block" type="submit" class="ion-margin-top">
+            Iniciar Sesión
+          </ion-button>
+        </form>
+
+        <!-- DEBUG: estado del formulario (quitar después) -->
+        <!-- <p style="font-size:11px;color:#999;margin-top:8px;">
+          Form valid: {{ loginForm.valid }} | 
+          Email errors: {{ loginForm.get('email')?.errors | json }} | 
+          Password errors: {{ loginForm.get('password')?.errors | json }}
+        </p> -->
+
+        <!-- <div class="register-link">
+          <p>
+            ¿No tienes cuenta? 
+            <a (click)="toggleForm()">Regístrate aquí</a>
+          </p>
+        </div> -->
+
+        <!-- Botón para descargar APK -->
+        <ion-button 
+          expand="block" 
+          fill="clear" 
+          href="https://apps.vanguardfresh.pe/jabas_y_parihuelas/app-release.apk"
+          download
+          class="ion-margin-top download-apk-button"
+        >
+          <ion-icon name="cloud-download-outline" slot="start"></ion-icon>
+          Descargar App para Android (Para equipo móvil solo usar app)
+        </ion-button>
+      </ion-card-content>
+    </ion-card>
+
+    <!-- Register Form -->
+    <ion-card *ngIf="showRegister">
+      <ion-card-header>
+        <ion-card-title>Crear Cuenta</ion-card-title>
+      </ion-card-header>
+
+      <ion-card-content>
+        <form [formGroup]="registerForm" (ngSubmit)="register()">
+          <ion-item>
+            <ion-label position="stacked">Nombre</ion-label>
+            <ion-input
+              formControlName="name"
+              type="text"
+              placeholder="Tu nombre completo"
+            ></ion-input>
+          </ion-item>
+          <ion-note color="danger" *ngIf="getErrorMessage(registerForm, 'name')">
+            {{ getErrorMessage(registerForm, 'name') }}
+          </ion-note>
+
+          <ion-item>
+            <ion-label position="stacked">Email</ion-label>
+            <ion-input
+              formControlName="email"
+              type="email"
+              placeholder="tu@email.com"
+            ></ion-input>
+          </ion-item>
+          <ion-note color="danger" *ngIf="getErrorMessage(registerForm, 'email')">
+            {{ getErrorMessage(registerForm, 'email') }}
+          </ion-note>
+
+          <ion-item>
+            <ion-label position="stacked">Contraseña</ion-label>
+            <ion-input
+              formControlName="password"
+              type="password"
+              placeholder="Mínimo 6 caracteres"
+            ></ion-input>
+          </ion-item>
+          <ion-note color="danger" *ngIf="getErrorMessage(registerForm, 'password')">
+            {{ getErrorMessage(registerForm, 'password') }}
+          </ion-note>
+
+          <ion-item>
+            <ion-label position="stacked">Confirmar Contraseña</ion-label>
+            <ion-input
+              formControlName="password_confirmation"
+              type="password"
+              placeholder="Repite tu contraseña"
+            ></ion-input>
+          </ion-item>
+          <ion-note color="danger" *ngIf="getErrorMessage(registerForm, 'password_confirmation')">
+            {{ getErrorMessage(registerForm, 'password_confirmation') }}
+          </ion-note>
+
+          <ion-button expand="block" type="submit" class="ion-margin-top">
+            Crear Cuenta
+          </ion-button>
+        </form>
+
+        <div class="register-link">
+          <p>
+            ¿Ya tienes cuenta? 
+            <a (click)="toggleForm()">Inicia sesión aquí</a>
+          </p>
+        </div>
+      </ion-card-content>
+    </ion-card>
+  </div>
+</ion-content>

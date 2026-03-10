@@ -1,0 +1,103 @@
+<ion-header>
+  <ion-toolbar color="primary">
+    <ion-buttons slot="start">
+      <ion-button (click)="volver()">
+        <ion-icon name="close"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+    <ion-title>{{ isEditMode ? 'Editar Usuario' : 'Nuevo Usuario' }}</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="guardar()" [disabled]="usuarioForm.invalid || loading">
+        <ion-icon name="checkmark"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <form [formGroup]="usuarioForm">
+    <ion-card>
+      <ion-card-header>
+        <ion-card-title>Información del Usuario</ion-card-title>
+      </ion-card-header>
+
+      <ion-card-content>
+        <ion-item>
+          <ion-label position="stacked">Nombre *</ion-label>
+          <ion-input
+            formControlName="name"
+            type="text"
+            placeholder="Nombre completo del usuario"
+          ></ion-input>
+        </ion-item>
+        <ion-note color="danger" *ngIf="usuarioForm.get('name')?.touched && usuarioForm.get('name')?.invalid">
+          {{ getErrorMessage('name') }}
+        </ion-note>
+
+        <ion-item>
+          <ion-label position="stacked">Email *</ion-label>
+          <ion-input
+            formControlName="email"
+            type="email"
+            placeholder="usuario@example.com"
+          ></ion-input>
+        </ion-item>
+        <ion-note color="danger" *ngIf="usuarioForm.get('email')?.touched && usuarioForm.get('email')?.invalid">
+          {{ getErrorMessage('email') }}
+        </ion-note>
+
+        <ion-item>
+          <ion-label position="stacked">Rol *</ion-label>
+          <ion-select formControlName="role_id" placeholder="Selecciona un rol">
+            <ion-select-option *ngFor="let rol of roles" [value]="rol.id">
+              {{ rol.nombre }}
+            </ion-select-option>
+          </ion-select>
+        </ion-item>
+        <ion-note color="danger" *ngIf="usuarioForm.get('role_id')?.touched && usuarioForm.get('role_id')?.invalid">
+          {{ getErrorMessage('role_id') }}
+        </ion-note>
+
+        <ion-item>
+          <ion-label position="stacked">
+            Contraseña {{ isEditMode ? '(dejar vacío para no cambiar)' : '*' }}
+          </ion-label>
+          <ion-input
+            formControlName="password"
+            type="password"
+            [placeholder]="isEditMode ? 'Nueva contraseña' : 'Mínimo 6 caracteres'"
+          ></ion-input>
+        </ion-item>
+        <ion-note color="danger" *ngIf="usuarioForm.get('password')?.touched && usuarioForm.get('password')?.invalid">
+          {{ getErrorMessage('password') }}
+        </ion-note>
+
+        <ion-item>
+          <ion-label>Estado</ion-label>
+          <ion-checkbox formControlName="activo" slot="end"></ion-checkbox>
+        </ion-item>
+        <ion-note>
+          {{ usuarioForm.get('activo')?.value ? 'Usuario activo' : 'Usuario inactivo' }}
+        </ion-note>
+      </ion-card-content>
+    </ion-card>
+
+    <ion-card>
+      <ion-card-content>
+        <ion-note color="medium">
+          <p><strong>Nota:</strong> El campo Microsoft ID se actualiza automáticamente cuando el usuario se conecta mediante Single Sign-On (SSO) de Microsoft.</p>
+        </ion-note>
+      </ion-card-content>
+    </ion-card>
+
+    <div class="action-buttons">
+      <ion-button expand="block" color="medium" (click)="volver()">
+        Cancelar
+      </ion-button>
+      
+      <ion-button expand="block" color="primary" (click)="guardar()" [disabled]="usuarioForm.invalid || loading">
+        {{ isEditMode ? 'Actualizar' : 'Crear' }} Usuario
+      </ion-button>
+    </div>
+  </form>
+</ion-content>

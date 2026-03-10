@@ -1,0 +1,88 @@
+<ion-header [translucent]="true">
+  <ion-toolbar color="primary">
+    <ion-buttons slot="start">
+      <ion-button (click)="volver()">
+        <ion-icon name="arrow-back"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+    <ion-title>Gestión de Placas</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="nuevaPlaca()">
+        <ion-icon name="add"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+  <ion-toolbar>
+    <ion-searchbar 
+      [(ngModel)]="searchTerm"
+      (ionInput)="buscar($event)"
+      placeholder="Buscar por placa, tipo o marca"
+      animated
+    ></ion-searchbar>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <ion-refresher slot="fixed" (ionRefresh)="doRefresh($event)">
+    <ion-refresher-content></ion-refresher-content>
+  </ion-refresher>
+
+  <div class="ion-padding" *ngIf="loading">
+    <ion-spinner></ion-spinner>
+    <p>Cargando placas...</p>
+  </div>
+
+  <ion-list *ngIf="!loading && placasFiltradas.length > 0">
+    <ion-item *ngFor="let placa of placasFiltradas">
+      <ion-icon [name]="getTipoIcon(placa.tipo_vehiculo)" slot="start" style="font-size: 32px;" (click)="editarPlaca(placa.id)"></ion-icon>
+      <ion-label (click)="editarPlaca(placa.id)">
+        <h2>
+          <strong>{{ placa.numero_placa }}</strong>
+          <ion-badge [color]="placa.activo ? 'success' : 'medium'" style="margin-left: 8px;">
+            {{ placa.activo ? 'Activa' : 'Inactiva' }}
+          </ion-badge>
+        </h2>
+        <p *ngIf="placa.tipo_vehiculo">
+          <ion-icon name="cube-outline"></ion-icon>
+          Tipo: {{ placa.tipo_vehiculo }}
+        </p>
+        <p *ngIf="placa.marca">
+          <ion-icon name="pricetag-outline"></ion-icon>
+          Marca: {{ placa.marca }}
+        </p>
+        <p *ngIf="placa.modelo">
+          <ion-icon name="information-circle-outline"></ion-icon>
+          Modelo: {{ placa.modelo }} {{ placa.anio ? '(' + placa.anio + ')' : '' }}
+        </p>
+      </ion-label>
+
+      <ion-button slot="end" fill="clear" color="warning" (click)="toggleEstado(placa)">
+        <ion-icon slot="icon-only" [name]="placa.activo ? 'ban-outline' : 'checkmark-circle-outline'"></ion-icon>
+      </ion-button>
+
+      <ion-button slot="end" fill="clear" color="primary" (click)="editarPlaca(placa.id)">
+        <ion-icon slot="icon-only" name="create-outline"></ion-icon>
+      </ion-button>
+
+      <ion-button slot="end" fill="clear" color="danger" (click)="eliminarPlaca(placa)">
+        <ion-icon slot="icon-only" name="trash-outline"></ion-icon>
+      </ion-button>
+    </ion-item>
+  </ion-list>
+
+  <div class="ion-padding ion-text-center" *ngIf="!loading && placasFiltradas.length === 0">
+    <ion-icon name="car-outline" style="font-size: 64px; color: var(--ion-color-medium);"></ion-icon>
+    <h2>No hay placas</h2>
+    <p>{{ searchTerm ? 'No se encontraron resultados' : 'Agrega tu primera placa' }}</p>
+    <ion-button (click)="nuevaPlaca()" *ngIf="!searchTerm">
+      <ion-icon name="add" slot="start"></ion-icon>
+      Nueva Placa
+    </ion-button>
+  </div>
+
+  <ion-fab vertical="bottom" horizontal="end" slot="fixed">
+    <ion-fab-button (click)="nuevaPlaca()" color="primary">
+      <ion-icon name="add"></ion-icon>
+    </ion-fab-button>
+  </ion-fab>
+</ion-content>

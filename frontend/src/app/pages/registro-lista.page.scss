@@ -1,0 +1,29 @@
+ion-item {
+  --padding-start: 16px;
+}
+
+ion-badge {
+  font-size: 0.75rem;
+  padding: 4px 8px;
+}
+
+ion-icon {
+  margin-right: 4px;
+  vertical-align: middle;
+}
+
+.ion-padding {
+  padding: 20px;
+}
+
+ion-fab-button {
+  --box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+}
+
+ion-searchbar {
+  --border-radius: 8px;
+}
+
+ion-datetime-button {
+  width: 100%;
+}

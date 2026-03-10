@@ -1,0 +1,7 @@
+{
+  "terminal.integrated.env.windows": {
+    "PATH": "C:\\laragon\\bin\\php\\php-8.3.26-Win32-vs16-x64;C:\\laragon\\bin\\nodejs\\node-v22;C:\\laragon\\bin\\composer;${env:PATH}"
+  },
+  "terminal.integrated.defaultProfile.windows": "PowerShell",
+  "php.validate.executablePath": "C:\\laragon\\bin\\php\\php-8.3.26-Win32-vs16-x64\\php.exe"
+}

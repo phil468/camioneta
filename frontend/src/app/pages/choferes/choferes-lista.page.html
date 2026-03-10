@@ -1,0 +1,90 @@
+<ion-header [translucent]="true">
+  <ion-toolbar color="primary">
+    <ion-buttons slot="start">
+      <ion-button (click)="volver()">
+        <ion-icon name="arrow-back"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+    <ion-title>Gestión de Choferes</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="nuevoChofer()">
+        <ion-icon name="add"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+  <ion-toolbar>
+    <ion-searchbar 
+      [(ngModel)]="searchTerm"
+      (ionInput)="buscar($event)"
+      placeholder="Buscar por nombre, DNI o licencia"
+      animated
+    ></ion-searchbar>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <ion-refresher slot="fixed" (ionRefresh)="doRefresh($event)">
+    <ion-refresher-content></ion-refresher-content>
+  </ion-refresher>
+
+  <div class="ion-padding" *ngIf="loading">
+    <ion-spinner></ion-spinner>
+    <p>Cargando choferes...</p>
+  </div>
+
+  <ion-list *ngIf="!loading && choferesFiltrados.length > 0">
+    <ion-item *ngFor="let chofer of choferesFiltrados">
+      <ion-avatar slot="start" (click)="editarChofer(chofer.id)">
+        <ion-icon name="person-circle-outline" style="font-size: 48px;"></ion-icon>
+      </ion-avatar>
+      <ion-label (click)="editarChofer(chofer.id)">
+        <h2>
+          <strong>{{ chofer.nombre }}</strong>
+          <ion-badge [color]="chofer.activo ? 'success' : 'medium'" style="margin-left: 8px;">
+            {{ chofer.activo ? 'Activo' : 'Inactivo' }}
+          </ion-badge>
+        </h2>
+        <p>
+          <ion-icon name="card-outline"></ion-icon>
+          DNI: {{ chofer.dni }}
+        </p>
+        <p *ngIf="chofer.licencia">
+          <ion-icon name="car-outline"></ion-icon>
+          Licencia: {{ chofer.licencia }}
+        </p>
+        <p *ngIf="chofer.telefono">
+          <ion-icon name="call-outline"></ion-icon>
+          {{ chofer.telefono }}
+        </p>
+      </ion-label>
+
+      <ion-button slot="end" fill="clear" color="warning" (click)="toggleEstado(chofer)">
+        <ion-icon slot="icon-only" [name]="chofer.activo ? 'ban-outline' : 'checkmark-circle-outline'"></ion-icon>
+      </ion-button>
+
+      <ion-button slot="end" fill="clear" color="primary" (click)="editarChofer(chofer.id)">
+        <ion-icon slot="icon-only" name="create-outline"></ion-icon>
+      </ion-button>
+
+      <ion-button slot="end" fill="clear" color="danger" (click)="eliminarChofer(chofer)">
+        <ion-icon slot="icon-only" name="trash-outline"></ion-icon>
+      </ion-button>
+    </ion-item>
+  </ion-list>
+
+  <div class="ion-padding ion-text-center" *ngIf="!loading && choferesFiltrados.length === 0">
+    <ion-icon name="person-outline" style="font-size: 64px; color: var(--ion-color-medium);"></ion-icon>
+    <h2>No hay choferes</h2>
+    <p>{{ searchTerm ? 'No se encontraron resultados' : 'Agrega tu primer chofer' }}</p>
+    <ion-button (click)="nuevoChofer()" *ngIf="!searchTerm">
+      <ion-icon name="add" slot="start"></ion-icon>
+      Nuevo Chofer
+    </ion-button>
+  </div>
+
+  <ion-fab vertical="bottom" horizontal="end" slot="fixed">
+    <ion-fab-button (click)="nuevoChofer()" color="primary">
+      <ion-icon name="add"></ion-icon>
+    </ion-fab-button>
+  </ion-fab>
+</ion-content>

@@ -1,0 +1,187 @@
+<ion-header>
+  <ion-toolbar color="primary">
+    <ion-buttons slot="start">
+      <ion-button (click)="volver()">
+        <ion-icon name="arrow-back-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+    <ion-title>Dashboard</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="cargarEstadisticas()">
+        <ion-icon name="refresh-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <ion-refresher slot="fixed" (ionRefresh)="cargarEstadisticas()">
+    <ion-refresher-content></ion-refresher-content>
+  </ion-refresher>
+
+  <div *ngIf="loading" class="loading-state">
+    <ion-spinner name="crescent"></ion-spinner>
+    <p>Cargando estadísticas...</p>
+  </div>
+
+  <div *ngIf="!loading && estadisticas">
+    <!-- Tarjetas de Totales -->
+    <ion-grid class="ion-padding">
+      <ion-row>
+        <ion-col size="6" size-md="3">
+          <ion-card class="stat-card registros">
+            <ion-card-content>
+              <ion-icon name="document-text-outline"></ion-icon>
+              <h1>{{ estadisticas.totales.total_registros }}</h1>
+              <p>Registros Totales</p>
+            </ion-card-content>
+          </ion-card>
+        </ion-col>
+
+        <ion-col size="6" size-md="3">
+          <ion-card class="stat-card clientes">
+            <ion-card-content>
+              <ion-icon name="business-outline"></ion-icon>
+              <h1>{{ estadisticas.totales.total_clientes }}</h1>
+              <p>Clientes Activos</p>
+            </ion-card-content>
+          </ion-card>
+        </ion-col>
+
+        <ion-col size="6" size-md="3">
+          <ion-card class="stat-card choferes">
+            <ion-card-content>
+              <ion-icon name="person-outline"></ion-icon>
+              <h1>{{ estadisticas.totales.total_choferes }}</h1>
+              <p>Choferes Activos</p>
+            </ion-card-content>
+          </ion-card>
+        </ion-col>
+
+        <ion-col size="6" size-md="3">
+          <ion-card class="stat-card placas">
+            <ion-card-content>
+              <ion-icon name="car-sport-outline"></ion-icon>
+              <h1>{{ estadisticas.totales.total_placas }}</h1>
+              <p>Placas Activas</p>
+            </ion-card-content>
+          </ion-card>
+        </ion-col>
+      </ion-row>
+
+      <!-- Gráficos -->
+      <ion-row>
+        <ion-col size="12" size-md="6">
+          <ion-card>
+            <ion-card-content class="chart-container">
+              <canvas #estadoChart></canvas>
+            </ion-card-content>
+          </ion-card>
+        </ion-col>
+
+        <ion-col size="12" size-md="6">
+          <ion-card>
+            <ion-card-content class="chart-container">
+              <canvas #mesChart></canvas>
+            </ion-card-content>
+          </ion-card>
+        </ion-col>
+
+        <ion-col size="12" size-md="6">
+          <ion-card>
+            <ion-card-content class="chart-container">
+              <canvas #clientesChart></canvas>
+            </ion-card-content>
+          </ion-card>
+        </ion-col>
+
+        <ion-col size="12" size-md="6">
+          <ion-card>
+            <ion-card-content class="chart-container">
+              <canvas #choferesChart></canvas>
+            </ion-card-content>
+          </ion-card>
+        </ion-col>
+      </ion-row>
+
+      <!-- Estadísticas de Cantidades -->
+      <ion-row>
+        <ion-col size="12">
+          <ion-card>
+            <ion-card-header>
+              <ion-card-title>Estadísticas de Cantidades</ion-card-title>
+            </ion-card-header>
+            <ion-card-content>
+              <ion-grid>
+                <ion-row>
+                  <ion-col size="6" size-md="3">
+                    <div class="quantity-stat">
+                      <ion-icon name="arrow-up-circle" color="success"></ion-icon>
+                      <h2>{{ estadisticas.estadisticas_cantidades.total_jabas}}</h2>
+                      <p>Total Jabas</p>
+                    </div>
+                  </ion-col>
+                  <ion-col size="6" size-md="3">
+                    <div class="quantity-stat">
+                      <ion-icon name="arrow-down-circle" color="primary"></ion-icon>
+                      <h2>{{ estadisticas.estadisticas_cantidades.total_parihuelas }}</h2>
+                      <p>Total Parihuelas</p>
+                    </div>
+                  </ion-col>
+                  <ion-col size="6" size-md="3">
+                    <div class="quantity-stat">
+                      <ion-icon name="trending-up-outline" color="warning"></ion-icon>
+                      <h2>{{ estadisticas.estadisticas_cantidades.promedio_jabas }}</h2>
+                      <p>Promedio Jabas</p>
+                    </div>
+                  </ion-col>
+                  <ion-col size="6" size-md="3">
+                    <div class="quantity-stat">
+                      <ion-icon name="trending-down-outline" color="tertiary"></ion-icon>
+                      <h2>{{ estadisticas.estadisticas_cantidades.promedio_parihuelas }}</h2>
+                      <p>Promedio Parihuelas</p>
+                    </div>
+                  </ion-col>
+                </ion-row>
+              </ion-grid>
+            </ion-card-content>
+          </ion-card>
+        </ion-col>
+      </ion-row>
+
+      <!-- Registros Recientes -->
+      <ion-row>
+        <ion-col size="12">
+          <ion-card>
+            <ion-card-header>
+              <ion-card-title>Registros Recientes</ion-card-title>
+            </ion-card-header>
+            <ion-card-content class="recent-list">
+              <ion-list>
+                <ion-item 
+                  *ngFor="let registro of estadisticas.registros_recientes" 
+                  [button]="true"
+                  (click)="navegarA('/registro-detalle/' + registro.id)"
+                >
+                  <ion-label>
+                    <h2><strong>{{ registro.numero_registro }}</strong></h2>
+                    <p>{{ registro.cliente_nombre }} - {{ registro.chofer_nombre }}</p>
+                    <p>{{ registro.fecha }} - {{ registro.created_at }}</p>
+                  </ion-label>
+                  <ion-badge 
+                    [color]="registro.estado === 'aprobado' ? 'success' : 
+                             registro.estado === 'rechazado' ? 'danger' : 'warning'"
+                    slot="end"
+                  >
+                    {{ registro.estado === 'aprobado' ? 'Aprobado' : 
+                       registro.estado === 'rechazado' ? 'Rechazado' : 'Por Aprobar' }}
+                  </ion-badge>
+                </ion-item>
+              </ion-list>
+            </ion-card-content>
+          </ion-card>
+        </ion-col>
+      </ion-row>
+    </ion-grid>
+  </div>
+</ion-content>

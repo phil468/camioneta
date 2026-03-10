@@ -1,0 +1,101 @@
+/*
+ * App Global CSS
+ * ----------------------------------------------------------------------------
+ * Put style rules here that you want to apply globally. These styles are for
+ * the entire app and not just one component. Additionally, this file can be
+ * used as an entry point to import other CSS/Sass files to be included in the
+ * output CSS.
+ * For more information on global stylesheets, visit the documentation:
+ * https://ionicframework.com/docs/layout/global-stylesheets
+ */
+
+/* Core CSS required for Ionic components to work properly */
+@import "@ionic/angular/css/core.css";
+
+/* Basic CSS for apps built with Ionic */
+@import "@ionic/angular/css/normalize.css";
+@import "@ionic/angular/css/structure.css";
+@import "@ionic/angular/css/typography.css";
+@import "@ionic/angular/css/display.css";
+
+/* Optional CSS utils that can be commented out */
+@import "@ionic/angular/css/padding.css";
+@import "@ionic/angular/css/float-elements.css";
+@import "@ionic/angular/css/text-alignment.css";
+@import "@ionic/angular/css/text-transformation.css";
+@import "@ionic/angular/css/flex-utils.css";
+
+/**
+ * Ionic Dark Mode
+ * -----------------------------------------------------
+ * For more info, please see:
+ * https://ionicframework.com/docs/theming/dark-mode
+ */
+
+/* @import "@ionic/angular/css/palettes/dark.always.css"; */
+/* @import "@ionic/angular/css/palettes/dark.class.css"; */
+@import '@ionic/angular/css/palettes/dark.system.css';
+
+/**
+ * Custom Styles
+ * -----------------------------------------------------
+ */
+
+/* Modal de Firma */
+.firma-modal {
+  --width: 90%;
+  --max-width: 600px;
+  --height: auto;
+  --border-radius: 16px;
+}
+
+/* Modal de Visor de Imágenes */
+.image-viewer-modal {
+  --width: 95%;
+  --max-width: 1200px;
+  --height: 90%;
+  --border-radius: 8px;
+}
+
+@media (max-width: 576px) {
+  .firma-modal {
+    --width: 95%;
+    --height: auto;
+  }
+
+  .image-viewer-modal {
+    --width: 100%;
+    --height: 100%;
+    --border-radius: 0;
+  }
+}
+
+/* Alerta de Actualización */
+.update-alert {
+  .alert-head {
+    text-align: center;
+  }
+
+  .alert-message {
+    text-align: left;
+    white-space: pre-line; /* Respeta los saltos de línea \n */
+    font-size: 14px;
+    line-height: 1.6;
+    color: var(--ion-text-color);
+    padding: 10px 0;
+  }
+
+  .alert-button-group {
+    justify-content: space-between;
+    padding-top: 10px;
+    
+    button.secondary {
+      color: var(--ion-color-medium);
+    }
+    
+    button.primary {
+      color: var(--ion-color-primary);
+      font-weight: 600;
+    }
+  }
+}
