@@ -1,4 +1,4 @@
-package pe.vanguardfresh.jabasyparihuelas;
+package pe.vanguardfresh.camioneta;
 
 import com.getcapacitor.BridgeActivity;
 

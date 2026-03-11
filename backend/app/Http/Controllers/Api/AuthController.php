@@ -54,7 +54,7 @@ class AuthController extends Controller
         $userAgent = $request->header('User-Agent', '');
         if (
             stripos($userAgent, 'capacitor') !== false ||
-            stripos($userAgent, 'jabasyparihuelas') !== false ||
+            stripos($userAgent, 'camioneta') !== false ||
             stripos($userAgent, 'android') !== false ||
             stripos($userAgent, 'iphone') !== false ||
             stripos($userAgent, 'mobile') !== false
@@ -88,7 +88,7 @@ class AuthController extends Controller
                 $errorMessage = urlencode('Usuario no registrado en el sistema. Contacte al administrador.');
                 
                 if ($isMobile) {
-                    return redirect()->to("jabasyparihuelas://login?error={$errorMessage}");
+                    return redirect()->to("camioneta://login?error={$errorMessage}");
                 } else {
                     $frontendUrl = env('FRONTEND_URL', 'http://localhost:8100');
                     return redirect()->to("{$frontendUrl}/login?error={$errorMessage}");
@@ -100,7 +100,7 @@ class AuthController extends Controller
                 $errorMessage = urlencode('Usuario inactivo. Contacte al administrador.');
                 
                 if ($isMobile) {
-                    return redirect()->to("jabasyparihuelas://login?error={$errorMessage}");
+                    return redirect()->to("camioneta://login?error={$errorMessage}");
                 } else {
                     $frontendUrl = env('FRONTEND_URL', 'http://localhost:8100');
                     return redirect()->to("{$frontendUrl}/login?error={$errorMessage}");
@@ -148,7 +148,7 @@ class AuthController extends Controller
             if ($isMobile) {
                 // Usar deep link custom scheme para la app móvil
                 // Con Chrome Custom Tabs, esto cerrará automáticamente el navegador
-                $appScheme = 'jabasyparihuelas://auth-callback';
+                $appScheme = 'camioneta://auth-callback';
                 return redirect()->to(
                     "{$appScheme}?token={$token}&user={$userData}"
                 );
@@ -164,7 +164,7 @@ class AuthController extends Controller
             $errorMessage = urlencode($e->getMessage());
             
             if ($isMobile) {
-                $appScheme = 'jabasyparihuelas://login';
+                $appScheme = 'camioneta://login';
                 return redirect()->to(
                     "{$appScheme}?error={$errorMessage}"
                 );

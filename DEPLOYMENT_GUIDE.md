@@ -117,9 +117,9 @@ php artisan view:cache
 
 ```bash
 # Dar permisos a storage y bootstrap/cache
-sudo chown -R www-data:www-data /var/www/alquiler_jabas_parihuelas/backend
-sudo chmod -R 775 /var/www/alquiler_jabas_parihuelas/backend/storage
-sudo chmod -R 775 /var/www/alquiler_jabas_parihuelas/backend/bootstrap/cache
+sudo chown -R www-data:www-data /var/www/camioneta/backend
+sudo chmod -R 775 /var/www/camioneta/backend/storage
+sudo chmod -R 775 /var/www/camonieta/backend/bootstrap/cache
 ```
 
 ### Paso 6: Configurar Nginx

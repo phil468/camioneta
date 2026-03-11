@@ -1,8 +1,8 @@
 import type { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
-  appId: 'pe.vanguardfresh.jabasyparihuelas',
-  appName: 'Jabas y Parihuelas',
+  appId: 'pe.vanguardfresh.camioneta',
+  appName: 'Camioneta',
   webDir: 'www',
   server: {
     androidScheme: 'https',

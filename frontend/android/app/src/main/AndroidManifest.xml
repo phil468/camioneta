@@ -28,8 +28,8 @@
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
-                <data android:scheme="jabasyparihuelas" android:host="auth-callback" />
-                <data android:scheme="jabasyparihuelas" android:host="login" />
+                <data android:scheme="camioneta" android:host="auth-callback" />
+                <data android:scheme="camioneta" android:host="login" />
             </intent-filter>
 
             <!-- Deep Link para OAuth callback - MSAL (Microsoft) -->

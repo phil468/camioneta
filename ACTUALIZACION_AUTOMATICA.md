@@ -75,7 +75,7 @@ public function getCurrentVersion()
 #### 3. **Compilar el nuevo APK**:
 
 ```powershell
-cd c:\laragon\www\alquiler_jabas_parihuelas\frontend
+cd c:\laragon\www\camioneta\frontend
 npm run build:apk
 cd android
 .\gradlew assembleRelease
@@ -85,20 +85,20 @@ cd android
 
 ```powershell
 cd..
-scp android/app/build/outputs/apk/release/app-release.apk john.delacruz@172.18.10.10:/var/www/jabasyparihuelas/frontend/www/
+scp android/app/build/outputs/apk/release/app-release.apk john.delacruz@172.18.10.10:/var/www/camioneta/frontend/www/
 ```
 
 ---
 
-cd c:\laragon\www\alquiler_jabas_parihuelas\frontend
+cd c:\laragon\www\camioneta\frontend
 npm run build:apk
 cd android
 .\gradlew assembleRelease
 cd..
-scp android/app/build/outputs/apk/release/app-release.apk john.delacruz@172.18.10.10:/var/www/jabasyparihuelas/frontend/www/
+scp android/app/build/outputs/apk/release/app-release.apk john.delacruz@172.18.10.10:/var/www/camioneta/frontend/www/
 
 npm run build:web
-scp -r www/* john.delacruz@172.18.10.10:/var/www/jabasyparihuelas/frontend/www/
+scp -r www/* john.delacruz@172.18.10.10:/var/www/camioneta/frontend/www/
 
 ## 🎯 Tipos de Actualización
 
