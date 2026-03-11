@@ -36,8 +36,13 @@ return [
         'client_secret' => env('MICROSOFT_CLIENT_SECRET'),
         'redirect' => env('MICROSOFT_REDIRECT_URI'),
         'guzzle' => [
-            'verify' => env('APP_ENV') === 'production', // Solo verificar SSL en producción
+            'verify' => env('APP_ENV') === 'production',
         ],
+    ],
+
+    'telegram' => [
+        'bot_token' => env('TELEGRAM_BOT_TOKEN'),
+        'chat_id' => env('TELEGRAM_CHAT_ID'),
     ],
 
 ];

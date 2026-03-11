@@ -13,49 +13,25 @@
   <ion-grid class="ion-padding">
     <ion-row>
       <ion-col size="12" size-md="6">
-        <ion-card button (click)="navegarA('/clientes')">
+        <ion-card button (click)="navegarA('/camionetas')">
           <ion-card-header>
-            <ion-icon name="business" size="large" color="primary"></ion-icon>
-            <ion-card-title>Clientes</ion-card-title>
+            <ion-icon name="car-sport" size="large" color="primary"></ion-icon>
+            <ion-card-title>Camionetas</ion-card-title>
           </ion-card-header>
           <ion-card-content>
-            Administrar clientes con RUC, contacto y dirección
+            Administrar camionetas disponibles
           </ion-card-content>
         </ion-card>
       </ion-col>
 
       <ion-col size="12" size-md="6">
-        <ion-card button (click)="navegarA('/choferes')">
+        <ion-card button (click)="navegarA('/checklist-items')">
           <ion-card-header>
-            <ion-icon name="person" size="large" color="secondary"></ion-icon>
-            <ion-card-title>Choferes</ion-card-title>
+            <ion-icon name="checkbox" size="large" color="secondary"></ion-icon>
+            <ion-card-title>Items de Checklist</ion-card-title>
           </ion-card-header>
           <ion-card-content>
-            Administrar choferes con DNI, licencia y teléfono
-          </ion-card-content>
-        </ion-card>
-      </ion-col>
-
-      <ion-col size="12" size-md="6">
-        <ion-card button (click)="navegarA('/placas')">
-          <ion-card-header>
-            <ion-icon name="car-sport" size="large" color="success"></ion-icon>
-            <ion-card-title>Placas</ion-card-title>
-          </ion-card-header>
-          <ion-card-content>
-            Administrar vehículos con placa, tipo, marca y modelo
-          </ion-card-content>
-        </ion-card>
-      </ion-col>
-
-      <ion-col size="12" size-md="6">
-        <ion-card button (click)="navegarA('/descripciones')">
-          <ion-card-header>
-            <ion-icon name="cube" size="large" color="tertiary"></ion-icon>
-            <ion-card-title>Jabas</ion-card-title>
-          </ion-card-header>
-          <ion-card-content>
-            Administrar jabas y parihuelas con código y capacidad
+            Administrar items del checklist de uso de camioneta
           </ion-card-content>
         </ion-card>
       </ion-col>
@@ -71,33 +47,15 @@
           </ion-card-content>
         </ion-card>
       </ion-col>
-    </ion-row>
-
-    <ion-row>
-      <ion-col size="12">
-        <h2 style="margin: 24px 16px 8px">Importación Masiva</h2>
-      </ion-col>
 
       <ion-col size="12" size-md="6">
-        <ion-card button (click)="navegarA('/importar-choferes')">
+        <ion-card button (click)="navegarA('/auditoria')">
           <ion-card-header>
-            <ion-icon name="cloud-upload" size="large" color="secondary"></ion-icon>
-            <ion-card-title>Importar Choferes</ion-card-title>
+            <ion-icon name="shield-checkmark" size="large" color="tertiary"></ion-icon>
+            <ion-card-title>Auditoría</ion-card-title>
           </ion-card-header>
           <ion-card-content>
-            Cargar choferes masivamente desde archivo Excel
-          </ion-card-content>
-        </ion-card>
-      </ion-col>
-
-      <ion-col size="12" size-md="6">
-        <ion-card button (click)="navegarA('/importar-descripciones')">
-          <ion-card-header>
-            <ion-icon name="cloud-upload" size="large" color="tertiary"></ion-icon>
-            <ion-card-title>Importar Descripciones</ion-card-title>
-          </ion-card-header>
-          <ion-card-content>
-            Cargar descripciones de jabas masivamente desde Excel
+            Ver historial de cambios en reservas y usos
           </ion-card-content>
         </ion-card>
       </ion-col>

@@ -5,7 +5,7 @@
 ### Compilación Completa (desde cero)
 
 ```powershell
-cd c:\laragon\www\alquiler_jabas_parihuelas\frontend
+cd c:\laragon\www\camioneta\frontend
 
 # 1. Limpiar (opcional, solo si hay problemas)
 # Remove-Item -Recurse -Force www
@@ -30,7 +30,7 @@ cd android
 ### Compilación Rápida (si solo cambiaste código TypeScript)
 
 ```powershell
-cd c:\laragon\www\alquiler_jabas_parihuelas\frontend
+cd c:\laragon\www\camioneta\frontend
 
 # Solo rebuild y sync
 npm run build -- --configuration=mobile

@@ -1,0 +1,180 @@
+<ion-header>
+  <ion-toolbar color="primary">
+    <ion-buttons slot="start">
+      <ion-back-button *ngIf="vista === 'lista'" defaultHref="/"></ion-back-button>
+      <ion-button *ngIf="vista !== 'lista'" (click)="mostrarLista()">
+        <ion-icon name="list-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+    <ion-title>
+      {{ vista === 'lista' ? 'Uso de Camioneta' : (vista === 'nuevo' ? 'Nuevo Uso' : 'Detalle de Uso') }}
+    </ion-title>
+    <ion-buttons slot="end" *ngIf="vista === 'lista'">
+      <ion-button (click)="mostrarNuevo()">
+        <ion-icon name="play-circle-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <!-- ============ LISTA DE USOS ============ -->
+  <div *ngIf="vista === 'lista'">
+    <div *ngIf="loading" class="ion-text-center ion-padding">
+      <ion-spinner></ion-spinner>
+    </div>
+
+    <div *ngIf="!loading && usos.length === 0" class="ion-text-center ion-padding">
+      <p>No hay registros de uso</p>
+      <ion-button (click)="mostrarNuevo()">
+        <ion-icon name="play-circle-outline" slot="start"></ion-icon>
+        Iniciar Uso
+      </ion-button>
+    </div>
+
+    <ion-list *ngIf="!loading && usos.length > 0">
+      <ion-item *ngFor="let uso of usos" button (click)="verDetalle(uso)">
+        <ion-icon name="car-sport-outline" slot="start" [color]="getEstadoColor(uso.estado)"></ion-icon>
+        <ion-label>
+          <h2>{{ uso.camioneta?.nombre }} {{ uso.camioneta?.placa ? '(' + uso.camioneta?.placa + ')' : '' }}</h2>
+          <p>{{ uso.user?.name }} - {{ uso.hora_inicio | date:'dd/MM/yyyy HH:mm' }}</p>
+          <p *ngIf="uso.hora_fin">Fin: {{ uso.hora_fin | date:'dd/MM/yyyy HH:mm' }}</p>
+        </ion-label>
+        <ion-badge slot="end" [color]="getEstadoColor(uso.estado)">
+          {{ getEstadoLabel(uso.estado) }}
+        </ion-badge>
+      </ion-item>
+    </ion-list>
+  </div>
+
+  <!-- ============ NUEVO USO ============ -->
+  <div *ngIf="vista === 'nuevo'" class="ion-padding">
+    <!-- Selector de camioneta -->
+    <ion-item *ngIf="camionetas.length > 1">
+      <ion-label position="stacked">Camioneta</ion-label>
+      <ion-select [(ngModel)]="selectedCamionetaId" placeholder="Selecciona una camioneta">
+        <ion-select-option *ngFor="let c of camionetas" [value]="c.id">
+          {{ c.nombre }} {{ c.placa ? '(' + c.placa + ')' : '' }}
+        </ion-select-option>
+      </ion-select>
+    </ion-item>
+
+    <div *ngIf="camionetas.length === 1" class="ion-margin-bottom">
+      <ion-chip color="primary">
+        <ion-label>{{ camionetas[0].nombre }} {{ camionetas[0].placa ? '(' + camionetas[0].placa + ')' : '' }}</ion-label>
+      </ion-chip>
+    </div>
+
+    <!-- Checklist -->
+    <ion-card>
+      <ion-card-header>
+        <ion-card-title>
+          <ion-icon name="checkmark-circle-outline"></ion-icon>
+          Checklist de Condiciones
+        </ion-card-title>
+      </ion-card-header>
+      <ion-card-content>
+        <div *ngFor="let item of checklistForm; let i = index" class="checklist-item">
+          <div class="checklist-header">
+            <strong>{{ i + 1 }}. {{ item.nombre }}</strong>
+            <p class="checklist-desc" *ngIf="item.descripcion">{{ item.descripcion }}</p>
+          </div>
+          
+          <div class="checklist-controls">
+            <div class="respuesta-buttons">
+              <ion-button 
+                [fill]="item.respuesta ? 'solid' : 'outline'" 
+                color="success" 
+                size="small"
+                (click)="item.respuesta = true"
+              >
+                Sí
+              </ion-button>
+              <ion-button 
+                [fill]="!item.respuesta ? 'solid' : 'outline'" 
+                color="danger" 
+                size="small"
+                (click)="item.respuesta = false"
+              >
+                No
+              </ion-button>
+            </div>
+
+            <ion-button fill="clear" size="small" (click)="tomarFoto(item)">
+              <ion-icon name="camera-outline"></ion-icon>
+            </ion-button>
+          </div>
+
+          <img *ngIf="item.foto" [src]="item.foto" class="checklist-foto" alt="Foto checklist" />
+
+          <ion-item *ngIf="!item.respuesta">
+            <ion-label position="stacked">Comentario</ion-label>
+            <ion-textarea [(ngModel)]="item.comentario" placeholder="Describe el problema..."></ion-textarea>
+          </ion-item>
+        </div>
+      </ion-card-content>
+    </ion-card>
+
+    <!-- Observaciones -->
+    <ion-item>
+      <ion-label position="stacked">Observaciones generales</ion-label>
+      <ion-textarea [(ngModel)]="observaciones" placeholder="Observaciones opcionales..."></ion-textarea>
+    </ion-item>
+
+    <ion-button expand="block" class="ion-margin-top" (click)="guardarUso()">
+      <ion-icon name="save-outline" slot="start"></ion-icon>
+      Guardar e Iniciar Uso
+    </ion-button>
+  </div>
+
+  <!-- ============ DETALLE DE USO ============ -->
+  <div *ngIf="vista === 'detalle' && usoDetalle" class="ion-padding">
+    <ion-card>
+      <ion-card-header>
+        <ion-card-title>
+          {{ usoDetalle.camioneta?.nombre }}
+          <ion-badge [color]="getEstadoColor(usoDetalle.estado)">
+            {{ getEstadoLabel(usoDetalle.estado) }}
+          </ion-badge>
+        </ion-card-title>
+      </ion-card-header>
+      <ion-card-content>
+        <p><strong>Usuario:</strong> {{ usoDetalle.user?.name }}</p>
+        <p><strong>Inicio:</strong> {{ usoDetalle.hora_inicio | date:'dd/MM/yyyy HH:mm' }}</p>
+        <p *ngIf="usoDetalle.hora_fin"><strong>Fin:</strong> {{ usoDetalle.hora_fin | date:'dd/MM/yyyy HH:mm' }}</p>
+        <p *ngIf="usoDetalle.observaciones"><strong>Observaciones:</strong> {{ usoDetalle.observaciones }}</p>
+      </ion-card-content>
+    </ion-card>
+
+    <!-- Checklist respuestas -->
+    <ion-card *ngIf="usoDetalle.checklist_respuestas && usoDetalle.checklist_respuestas.length > 0">
+      <ion-card-header>
+        <ion-card-title>Checklist</ion-card-title>
+      </ion-card-header>
+      <ion-card-content>
+        <div *ngFor="let resp of usoDetalle.checklist_respuestas" class="checklist-respuesta">
+          <div class="respuesta-header">
+            <ion-icon 
+              [name]="resp.respuesta ? 'checkmark-circle-outline' : 'close-circle-outline'"
+              [color]="resp.respuesta ? 'success' : 'danger'"
+            ></ion-icon>
+            <span>{{ resp.checklist_item?.nombre }}</span>
+          </div>
+          <p *ngIf="resp.comentario" class="respuesta-comment">{{ resp.comentario }}</p>
+        </div>
+      </ion-card-content>
+    </ion-card>
+
+    <!-- Botón finalizar -->
+    <ion-button 
+      *ngIf="usoDetalle.estado === 'en_uso' && esPropietario(usoDetalle)"
+      expand="block" 
+      color="danger" 
+      class="ion-margin-top"
+      (click)="finalizarUso(usoDetalle)"
+    >
+      <ion-icon name="stop-circle-outline" slot="start"></ion-icon>
+      Finalizar Uso
+    </ion-button>
+  </div>
+</ion-content>

@@ -13,16 +13,10 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         $this->call([
-            ClienteSeeder::class,
-            ChoferSeeder::class,
-            PlacaSeeder::class,
-            DescripcionJabaSeeder::class,
+            RolesSeeder::class,
         ]);
 
-        $this->command->info('✅ Datos de prueba creados exitosamente!');
-        $this->command->info('   - Clientes: 5');
-        $this->command->info('   - Choferes: 8');
-        $this->command->info('   - Placas: 15');
-        $this->command->info('   - Descripciones: 10');
+        $this->command->info('✅ Datos iniciales creados exitosamente!');
+        $this->command->info('   - Roles: 2 (Administrador, Personal)');
     }
 }

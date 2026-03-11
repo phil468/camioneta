@@ -1,0 +1,69 @@
+.checklist-item {
+  border-bottom: 1px solid var(--ion-color-light-shade, #eee);
+  padding: 12px 0;
+
+  &:last-child {
+    border-bottom: none;
+  }
+
+  .checklist-header {
+    margin-bottom: 8px;
+
+    strong {
+      font-size: 15px;
+    }
+
+    .checklist-desc {
+      color: var(--ion-color-medium);
+      font-size: 13px;
+      margin: 4px 0 0;
+    }
+  }
+
+  .checklist-controls {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+
+    .respuesta-buttons {
+      display: flex;
+      gap: 4px;
+    }
+  }
+
+  .checklist-foto {
+    max-width: 200px;
+    max-height: 150px;
+    border-radius: 8px;
+    margin-top: 8px;
+    object-fit: cover;
+  }
+}
+
+.checklist-respuesta {
+  padding: 8px 0;
+  border-bottom: 1px solid var(--ion-color-light-shade, #eee);
+
+  &:last-child {
+    border-bottom: none;
+  }
+
+  .respuesta-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+
+    ion-icon {
+      font-size: 20px;
+    }
+  }
+
+  .respuesta-comment {
+    margin: 4px 0 0 28px;
+    font-size: 13px;
+    color: var(--ion-color-medium);
+    font-style: italic;
+  }
+}

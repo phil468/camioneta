@@ -21,6 +21,7 @@ import {
 import { AuthService } from './services/auth.service';
 import { PermisosService } from './services/permisos.service';
 import { VersionCheckService } from './services/version-check.service';
+import { Title } from 'chart.js';
 
 @Component({
   selector: 'app-root',
@@ -57,23 +58,36 @@ export class AppComponent {
       permission: null, // Todos pueden acceder
     },
     {
-      title: 'Nuevo Registro',
-      url: '/registro-form',
-      icon: 'add-circle',
-      permission: 'crear_registro',
+      title: 'Uso',
+      url: '/uso-camioneta',
+      icon: 'car',
+      permission: 'uso_camioneta',
     },
     {
-      title: 'Lista de Registros',
-      url: '/registro-lista',
-      icon: 'list',
-      permission: 'ver_registros',
+      title: 'Reservas',
+      url: '/reserva-camioneta',
+      icon: 'calendar',
+      permission: 'reserva_camioneta',
     },
-    {
-      title: 'Dashboard',
-      url: '/dashboard',
-      icon: 'stats-chart',
-      permission: null, // Todos pueden ver el dashboard
-    },
+
+    // {
+    //   title: 'Nuevo Registro',
+    //   url: '/registro-form',
+    //   icon: 'add-circle',
+    //   permission: 'crear_registro',
+    // },
+    // {
+    //   title: 'Lista de Registros',
+    //   url: '/registro-lista',
+    //   icon: 'list',
+    //   permission: 'ver_registros',
+    // },
+    // {
+    //   title: 'Dashboard',
+    //   url: '/dashboard',
+    //   icon: 'stats-chart',
+    //   permission: null, // Todos pueden ver el dashboard
+    // },
     {
       title: 'Configuración',
       url: '/configuracion',
@@ -81,30 +95,30 @@ export class AppComponent {
       permission: 'configuracion',
       divider: true,
     },
-    {
-      title: 'Clientes',
-      url: '/clientes',
-      icon: 'people',
-      permission: 'configuracion',
-    },
-    {
-      title: 'Choferes',
-      url: '/choferes',
-      icon: 'person',
-      permission: 'configuracion',
-    },
-    {
-      title: 'Placas',
-      url: '/placas',
-      icon: 'car',
-      permission: 'configuracion',
-    },
-    {
-      title: 'Jabas',
-      url: '/descripciones',
-      icon: 'cube',
-      permission: 'configuracion',
-    },
+    // {
+    //   title: 'Clientes',
+    //   url: '/clientes',
+    //   icon: 'people',
+    //   permission: 'configuracion',
+    // },
+    // {
+    //   title: 'Choferes',
+    //   url: '/choferes',
+    //   icon: 'person',
+    //   permission: 'configuracion',
+    // },
+    // {
+    //   title: 'Placas',
+    //   url: '/placas',
+    //   icon: 'car',
+    //   permission: 'configuracion',
+    // },
+    // {
+    //   title: 'Jabas',
+    //   url: '/descripciones',
+    //   icon: 'cube',
+    //   permission: 'configuracion',
+    // },
     {
       title: 'Usuarios',
       url: '/usuarios',

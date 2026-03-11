@@ -18,7 +18,7 @@ import {
   IonMenuButton,
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
-import { addCircle, list, settings, statsChart } from 'ionicons/icons';
+import { carSport, calendar, settings } from 'ionicons/icons';
 import { PermisosService } from '../services/permisos.service';
 
 @Component({
@@ -45,8 +45,11 @@ import { PermisosService } from '../services/permisos.service';
   ],
 })
 export class HomePage {
-  constructor(private router: Router, public permisos: PermisosService) {
-    addIcons({ addCircle, list, settings, statsChart });
+  constructor(
+    private router: Router,
+    public permisos: PermisosService,
+  ) {
+    addIcons({ carSport, calendar, settings });
   }
 
   navegarA(ruta: string) {

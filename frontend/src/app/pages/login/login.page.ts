@@ -52,6 +52,7 @@ export class LoginPage implements OnInit {
   loginForm: FormGroup;
   registerForm: FormGroup;
   showRegister = false;
+  showLocalLogin = false;
 
   constructor(
     private fb: FormBuilder,
@@ -78,6 +79,13 @@ export class LoginPage implements OnInit {
       email: ['', [Validators.required, Validators.email]],
       password: ['', [Validators.required, Validators.minLength(6)]],
       password_confirmation: ['', [Validators.required]],
+    });
+
+    // Keyboard shortcut: Ctrl+Shift+L para mostrar login local
+    document.addEventListener('keydown', (event: KeyboardEvent) => {
+      if (event.ctrlKey && event.shiftKey && event.key === 'L') {
+        this.showLocalLogin = !this.showLocalLogin;
+      }
     });
   }
 

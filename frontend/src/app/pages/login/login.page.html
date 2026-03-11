@@ -2,8 +2,7 @@
   <div class="login-container">
     <div class="login-header">
       <img src="assets/images/Logotipo Vertical - Grupo Vanguard Internacional.png" alt="Grupo Vanguard Internacional" style="max-width: 300px; margin-bottom: 20px;">
-      <h1>Control de Alquiler <br> de Jabas y Parihuelas</h1>
-      <!-- <p>Jabas y Parihuelas</p> -->
+      <h1>Control de Camioneta</h1>
     </div>
 
     <!-- Login Form -->
@@ -24,39 +23,42 @@
           Continuar con Microsoft
         </ion-button>
 
-        <div class="divider">
-          <span>O</span>
+        <!-- Login local oculto: se muestra con Ctrl+Shift+L -->
+        <div *ngIf="showLocalLogin" class="local-login-section">
+          <div class="divider">
+            <span>Acceso Local</span>
+          </div>
+
+          <form [formGroup]="loginForm" (ngSubmit)="login()">
+            <ion-item>
+              <ion-label position="stacked">Email</ion-label>
+              <ion-input
+                formControlName="email"
+                type="email"
+                placeholder="tu@email.com"
+              ></ion-input>
+            </ion-item>
+            <ion-note color="danger" *ngIf="getErrorMessage(loginForm, 'email')">
+              {{ getErrorMessage(loginForm, 'email') }}
+            </ion-note>
+
+            <ion-item>
+              <ion-label position="stacked">Contraseña</ion-label>
+              <ion-input
+                formControlName="password"
+                type="password"
+                placeholder="••••••••"
+              ></ion-input>
+            </ion-item>
+            <ion-note color="danger" *ngIf="getErrorMessage(loginForm, 'password')">
+              {{ getErrorMessage(loginForm, 'password') }}
+            </ion-note>
+
+            <ion-button expand="block" type="submit" class="ion-margin-top">
+              Iniciar Sesión
+            </ion-button>
+          </form>
         </div>
-
-        <form [formGroup]="loginForm" (ngSubmit)="login()">
-          <ion-item>
-            <ion-label position="stacked">Email</ion-label>
-            <ion-input
-              formControlName="email"
-              type="email"
-              placeholder="tu@email.com"
-            ></ion-input>
-          </ion-item>
-          <ion-note color="danger" *ngIf="getErrorMessage(loginForm, 'email')">
-            {{ getErrorMessage(loginForm, 'email') }}
-          </ion-note>
-
-          <ion-item>
-            <ion-label position="stacked">Contraseña</ion-label>
-            <ion-input
-              formControlName="password"
-              type="password"
-              placeholder="••••••••"
-            ></ion-input>
-          </ion-item>
-          <ion-note color="danger" *ngIf="getErrorMessage(loginForm, 'password')">
-            {{ getErrorMessage(loginForm, 'password') }}
-          </ion-note>
-
-          <ion-button expand="block" type="submit" class="ion-margin-top">
-            Iniciar Sesión
-          </ion-button>
-        </form>
 
         <!-- DEBUG: estado del formulario (quitar después) -->
         <!-- <p style="font-size:11px;color:#999;margin-top:8px;">

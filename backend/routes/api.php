@@ -2,17 +2,15 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\Api\ClienteController;
-use App\Http\Controllers\Api\RepresentanteClienteController;
-use App\Http\Controllers\Api\ChoferController;
-use App\Http\Controllers\Api\PlacaController;
-use App\Http\Controllers\Api\DescripcionJabaController;
-use App\Http\Controllers\Api\RegistroController;
-use App\Http\Controllers\Api\DashboardController;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\UserController;
 use App\Http\Controllers\Api\RoleController;
 use App\Http\Controllers\Api\AppVersionController;
+use App\Http\Controllers\Api\CamionetaController;
+use App\Http\Controllers\Api\ChecklistItemController;
+use App\Http\Controllers\Api\ReservaController;
+use App\Http\Controllers\Api\UsoCamionetaController;
+use App\Http\Controllers\Api\AuditoriaController;
 
 /*
 |--------------------------------------------------------------------------
@@ -49,43 +47,33 @@ Route::middleware(['auth:sanctum', 'user.active'])->prefix('v1/auth')->group(fun
     Route::post('refresh', [AuthController::class, 'refresh']);
 });
 
-// Rutas protegidas con autenticación (aplicar a todas las rutas de la API)
-Route::middleware(['user.active'])->prefix('v1')->group(function () {
+// Rutas protegidas con autenticación
+Route::middleware(['auth:sanctum', 'user.active'])->prefix('v1')->group(function () {
     
-    // Tablas de mantenimiento
-    Route::apiResource('clientes', ClienteController::class);
-    Route::apiResource('representantes-clientes', RepresentanteClienteController::class);
-    Route::post('representantes-clientes/{id}/activar', [RepresentanteClienteController::class, 'activar']);
-    Route::apiResource('choferes', ChoferController::class);
-    Route::apiResource('placas', PlacaController::class);
-    Route::apiResource('descripciones-jabas', DescripcionJabaController::class);
+    // === CAMIONETAS (mantenimiento) ===
+    Route::apiResource('camionetas', CamionetaController::class);
+    Route::get('opciones/camionetas', [CamionetaController::class, 'activas']);
+
+    // === CHECKLIST ITEMS (mantenimiento) ===
+    Route::apiResource('checklist-items', ChecklistItemController::class);
+    Route::get('opciones/checklist-items', [ChecklistItemController::class, 'activos']);
+
+    // === RESERVAS ===
+    Route::apiResource('reservas', ReservaController::class);
+    Route::get('reservas-slots/ocupados', [ReservaController::class, 'slotsOcupados']);
+
+    // === USO DE CAMIONETA ===
+    Route::apiResource('usos-camioneta', UsoCamionetaController::class);
+    Route::post('usos-camioneta/{id}/finalizar', [UsoCamionetaController::class, 'finalizar']);
+    Route::post('usos-camioneta/{usoId}/checklist/{respuestaId}/foto', [UsoCamionetaController::class, 'subirFotoChecklist']);
+
+    // === USUARIOS ===
     Route::apiResource('usuarios', UserController::class);
+    Route::get('opciones/usuarios', [UserController::class, 'activos']);
     Route::get('roles', [RoleController::class, 'index']);
     Route::get('roles/{id}', [RoleController::class, 'show']);
-    
-    // Registros principales
-    Route::apiResource('registros', RegistroController::class);
-    
-    // Rutas adicionales para registros
-    Route::post('registros/{id}/cambiar-estado', [RegistroController::class, 'cambiarEstado']);
-    Route::post('registros/{id}/adjuntar-pdf', [RegistroController::class, 'adjuntarPdf']);
-    Route::get('registros/{id}/generar-pdf', [RegistroController::class, 'generarPdf']);
-    Route::get('registros/{id}/descargar-guia', [RegistroController::class, 'descargarGuia']);
-    Route::get('registros/exportar/excel', [RegistroController::class, 'exportarExcel']);
-    Route::get('registros/exportar/excel', [RegistroController::class, 'exportarExcel']);
-    
-    // Rutas de importación masiva
-    Route::post('choferes/import', [ChoferController::class, 'import']);
-    Route::post('descripciones-jabas/import', [DescripcionJabaController::class, 'import']);
-    
-    // Ruta para obtener opciones activas (para dropdowns)
-    Route::get('opciones/clientes', [ClienteController::class, 'activos']);
-    Route::get('opciones/choferes', [ChoferController::class, 'activos']);
-    Route::get('opciones/placas', [PlacaController::class, 'activas']);
-    Route::get('opciones/descripciones-jabas', [DescripcionJabaController::class, 'activas']);
-    Route::get('opciones/usuarios', [UserController::class, 'activos']);
 
-    // Dashboard y estadísticas
-    Route::get('dashboard/estadisticas', [DashboardController::class, 'getEstadisticas']);
-    Route::get('dashboard/tendencias', [DashboardController::class, 'getTendencias']);
+    // === AUDITORÍA ===
+    Route::get('auditoria', [AuditoriaController::class, 'index']);
+    Route::get('auditoria/{id}', [AuditoriaController::class, 'show']);
 });

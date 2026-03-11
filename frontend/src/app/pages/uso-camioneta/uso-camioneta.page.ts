@@ -1,0 +1,361 @@
+import { Component, OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import {
+  IonHeader,
+  IonToolbar,
+  IonTitle,
+  IonContent,
+  IonButtons,
+  IonBackButton,
+  IonCard,
+  IonCardHeader,
+  IonCardTitle,
+  IonCardContent,
+  IonButton,
+  IonIcon,
+  IonLabel,
+  IonItem,
+  IonSelect,
+  IonSelectOption,
+  IonTextarea,
+  IonSpinner,
+  IonList,
+  IonBadge,
+  IonChip,
+  AlertController,
+  LoadingController,
+  ToastController,
+} from '@ionic/angular/standalone';
+import { addIcons } from 'ionicons';
+import {
+  carSportOutline,
+  checkmarkCircleOutline,
+  closeCircleOutline,
+  cameraOutline,
+  saveOutline,
+  stopCircleOutline,
+  playCircleOutline,
+  timeOutline,
+  listOutline,
+} from 'ionicons/icons';
+import { Camera, CameraResultType, CameraSource } from '@capacitor/camera';
+import {
+  ApiService,
+  Camioneta,
+  ChecklistItem,
+  UsoCamioneta,
+  UsoChecklistRespuesta,
+} from '../../services/api.service';
+import { PermisosService } from '../../services/permisos.service';
+
+interface ChecklistFormItem {
+  checklist_item_id: number;
+  nombre: string;
+  descripcion?: string;
+  respuesta: boolean;
+  foto?: string;
+  fotoFile?: File;
+  comentario: string;
+}
+
+@Component({
+  selector: 'app-uso-camioneta',
+  templateUrl: './uso-camioneta.page.html',
+  styleUrls: ['./uso-camioneta.page.scss'],
+  standalone: true,
+  imports: [
+    CommonModule,
+    FormsModule,
+    IonHeader,
+    IonToolbar,
+    IonTitle,
+    IonContent,
+    IonButtons,
+    IonBackButton,
+    IonCard,
+    IonCardHeader,
+    IonCardTitle,
+    IonCardContent,
+    IonButton,
+    IonIcon,
+    IonLabel,
+    IonItem,
+    IonSelect,
+    IonSelectOption,
+    IonTextarea,
+    IonSpinner,
+    IonList,
+    IonBadge,
+    IonChip,
+  ],
+})
+export class UsoCamionetaPage implements OnInit {
+  // Vista: 'lista' | 'nuevo' | 'detalle'
+  vista: 'lista' | 'nuevo' | 'detalle' = 'lista';
+
+  camionetas: Camioneta[] = [];
+  checklistItems: ChecklistItem[] = [];
+  usos: UsoCamioneta[] = [];
+  loading = false;
+
+  // Formulario nuevo uso
+  selectedCamionetaId: number | null = null;
+  observaciones = '';
+  checklistForm: ChecklistFormItem[] = [];
+
+  // Detalle
+  usoDetalle: UsoCamioneta | null = null;
+
+  constructor(
+    private apiService: ApiService,
+    public permisos: PermisosService,
+    private alertController: AlertController,
+    private loadingController: LoadingController,
+    private toastController: ToastController,
+  ) {
+    addIcons({
+      carSportOutline,
+      checkmarkCircleOutline,
+      closeCircleOutline,
+      cameraOutline,
+      saveOutline,
+      stopCircleOutline,
+      playCircleOutline,
+      timeOutline,
+      listOutline,
+    });
+  }
+
+  ngOnInit() {
+    this.loadData();
+  }
+
+  loadData() {
+    this.loadCamionetas();
+    this.loadChecklistItems();
+    this.loadUsos();
+  }
+
+  loadCamionetas() {
+    this.apiService.getCamionetasActivas().subscribe({
+      next: (res) => {
+        this.camionetas = res.data || [];
+        if (this.camionetas.length === 1) {
+          this.selectedCamionetaId = this.camionetas[0].id;
+        }
+      },
+    });
+  }
+
+  loadChecklistItems() {
+    this.apiService.getChecklistItemsActivos().subscribe({
+      next: (res) => {
+        this.checklistItems = res.data || [];
+        this.initChecklistForm();
+      },
+    });
+  }
+
+  loadUsos() {
+    this.loading = true;
+    const filters: any = {};
+
+    // Personal solo ve sus propios usos
+    if (!this.permisos.puedeVerTodo()) {
+      filters.solo_propias = true;
+    }
+
+    this.apiService.getUsosCamioneta(filters).subscribe({
+      next: (res) => {
+        this.usos = res.data || [];
+        this.loading = false;
+      },
+      error: () => {
+        this.loading = false;
+      },
+    });
+  }
+
+  initChecklistForm() {
+    this.checklistForm = this.checklistItems.map((item) => ({
+      checklist_item_id: item.id,
+      nombre: item.nombre,
+      descripcion: item.descripcion,
+      respuesta: true, // Por defecto todo en "Sí"
+      comentario: '',
+    }));
+  }
+
+  mostrarNuevo() {
+    this.vista = 'nuevo';
+    this.initChecklistForm();
+    this.observaciones = '';
+  }
+
+  mostrarLista() {
+    this.vista = 'lista';
+    this.loadUsos();
+  }
+
+  async tomarFoto(item: ChecklistFormItem) {
+    try {
+      const image = await Camera.getPhoto({
+        quality: 70,
+        allowEditing: false,
+        resultType: CameraResultType.DataUrl,
+        source: CameraSource.Camera,
+      });
+
+      if (image.dataUrl) {
+        item.foto = image.dataUrl;
+      }
+    } catch (err) {
+      console.error('Error tomando foto:', err);
+    }
+  }
+
+  async guardarUso() {
+    if (!this.selectedCamionetaId) {
+      const toast = await this.toastController.create({
+        message: 'Selecciona una camioneta',
+        duration: 2000,
+        color: 'warning',
+      });
+      await toast.present();
+      return;
+    }
+
+    const loading = await this.loadingController.create({
+      message: 'Guardando...',
+    });
+    await loading.present();
+
+    const data = {
+      camioneta_id: this.selectedCamionetaId,
+      observaciones: this.observaciones || null,
+      checklist: this.checklistForm.map((item) => ({
+        checklist_item_id: item.checklist_item_id,
+        respuesta: item.respuesta,
+        comentario: item.comentario || null,
+      })),
+    };
+
+    this.apiService.createUsoCamioneta(data).subscribe({
+      next: async (res) => {
+        await loading.dismiss();
+
+        // Subir fotos si existen
+        if (res.data) {
+          await this.subirFotos(res.data);
+        }
+
+        const toast = await this.toastController.create({
+          message: 'Uso registrado. Estado: EN USO',
+          duration: 3000,
+          color: 'success',
+        });
+        await toast.present();
+        this.mostrarLista();
+      },
+      error: async (err) => {
+        await loading.dismiss();
+        const errorMsg = err.error?.message || 'Error al guardar';
+        const alert = await this.alertController.create({
+          header: 'Error',
+          message: errorMsg,
+          buttons: ['OK'],
+        });
+        await alert.present();
+      },
+    });
+  }
+
+  private async subirFotos(uso: UsoCamioneta) {
+    if (!uso.checklist_respuestas) return;
+
+    for (let i = 0; i < this.checklistForm.length; i++) {
+      const formItem = this.checklistForm[i];
+      if (formItem.foto && uso.checklist_respuestas[i]) {
+        // Convertir dataUrl a File
+        const blob = await fetch(formItem.foto).then((r) => r.blob());
+        const file = new File([blob], `checklist_${uso.id}_${i}.jpg`, {
+          type: 'image/jpeg',
+        });
+
+        try {
+          await this.apiService
+            .subirFotoChecklist(uso.id, uso.checklist_respuestas[i].id!, file)
+            .toPromise();
+        } catch (err) {
+          console.error('Error subiendo foto:', err);
+        }
+      }
+    }
+  }
+
+  verDetalle(uso: UsoCamioneta) {
+    this.usoDetalle = uso;
+    this.vista = 'detalle';
+  }
+
+  async finalizarUso(uso: UsoCamioneta) {
+    const alert = await this.alertController.create({
+      header: 'Finalizar Uso',
+      message:
+        '¿Deseas finalizar el uso de la camioneta? Se registrará la hora de finalización.',
+      buttons: [
+        { text: 'Cancelar', role: 'cancel' },
+        {
+          text: 'Finalizar',
+          handler: async () => {
+            const loading = await this.loadingController.create({
+              message: 'Finalizando...',
+            });
+            await loading.present();
+
+            this.apiService.finalizarUsoCamioneta(uso.id).subscribe({
+              next: async (res) => {
+                await loading.dismiss();
+                const toast = await this.toastController.create({
+                  message: 'Uso finalizado correctamente',
+                  duration: 3000,
+                  color: 'success',
+                });
+                await toast.present();
+
+                if (this.vista === 'detalle' && res.data) {
+                  this.usoDetalle = res.data;
+                }
+                this.loadUsos();
+              },
+              error: async (err) => {
+                await loading.dismiss();
+                const errorAlert = await this.alertController.create({
+                  header: 'Error',
+                  message: err.error?.message || 'Error al finalizar',
+                  buttons: ['OK'],
+                });
+                await errorAlert.present();
+              },
+            });
+          },
+        },
+      ],
+    });
+    await alert.present();
+  }
+
+  getEstadoColor(estado: string): string {
+    return estado === 'en_uso' ? 'warning' : 'success';
+  }
+
+  getEstadoLabel(estado: string): string {
+    return estado === 'en_uso' ? 'EN USO' : 'FINALIZADO';
+  }
+
+  esPropietario(uso: UsoCamioneta): boolean {
+    const userId = this.permisos.getCurrentUserId();
+    return uso.user_id === userId;
+  }
+}

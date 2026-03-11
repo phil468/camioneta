@@ -1,0 +1,112 @@
+<ion-header>
+  <ion-toolbar color="primary">
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/"></ion-back-button>
+    </ion-buttons>
+    <ion-title>Reserva de Camioneta</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="loadReservas()">
+        <ion-icon name="refresh-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <!-- Selector de camioneta -->
+  <ion-item *ngIf="camionetas.length > 1">
+    <ion-label position="stacked">Camioneta</ion-label>
+    <ion-select
+      [(ngModel)]="selectedCamionetaId"
+      (ionChange)="onCamionetaChange()"
+      placeholder="Selecciona una camioneta"
+    >
+      <ion-select-option *ngFor="let c of camionetas" [value]="c.id">
+        {{ c.nombre }} {{ c.placa ? '(' + c.placa + ')' : '' }}
+      </ion-select-option>
+    </ion-select>
+  </ion-item>
+
+  <div *ngIf="camionetas.length === 1" class="ion-padding-horizontal ion-padding-top">
+    <ion-chip color="primary">
+      <ion-icon name="car-sport"></ion-icon>
+      <ion-label>{{ camionetas[0].nombre }} {{ camionetas[0].placa ? '(' + camionetas[0].placa + ')' : '' }}</ion-label>
+    </ion-chip>
+  </div>
+
+  <!-- Leyenda -->
+  <div class="legend ion-padding-horizontal">
+    <span class="legend-item">
+      <span class="legend-color disponible"></span> Disponible
+    </span>
+    <span class="legend-item">
+      <span class="legend-color ocupado"></span> Ocupado
+    </span>
+    <span class="legend-item">
+      <span class="legend-color seleccionado"></span> Seleccionado
+    </span>
+    <span class="legend-item">
+      <span class="legend-color pasado"></span> Pasado
+    </span>
+  </div>
+
+  <!-- Loading -->
+  <div *ngIf="loading" class="ion-text-center ion-padding">
+    <ion-spinner></ion-spinner>
+    <p>Cargando horarios...</p>
+  </div>
+
+  <!-- Grid de reservas por día -->
+  <div *ngIf="!loading && selectedCamionetaId" class="days-container">
+    <ion-card *ngFor="let day of days; let dIdx = index" class="day-card">
+      <ion-card-header>
+        <ion-card-title class="day-title">
+          <ion-icon name="calendar-outline"></ion-icon>
+          {{ day.label }}
+        </ion-card-title>
+      </ion-card-header>
+      <ion-card-content>
+        <div class="slots-grid" (mouseleave)="onSlotMouseUp()">
+          <div
+            *ngFor="let slot of day.slots; let sIdx = index"
+            class="slot-cell"
+            [class.disponible]="slot.estado === 'disponible'"
+            [class.ocupado]="slot.estado === 'ocupado'"
+            [class.seleccionado]="slot.estado === 'seleccionado'"
+            [class.pasado]="slot.estado === 'pasado'"
+            (mousedown)="onSlotMouseDown(dIdx, sIdx)"
+            (mouseenter)="onSlotMouseEnter(dIdx, sIdx)"
+            (mouseup)="onSlotMouseUp()"
+            (click)="onSlotClick(dIdx, sIdx)"
+            [title]="slot.estado === 'ocupado' ? slot.reservadoPor || '' : slot.display"
+          >
+            {{ slot.display }}
+          </div>
+        </div>
+      </ion-card-content>
+    </ion-card>
+  </div>
+
+  <!-- Selección actual y botón guardar -->
+  <div *ngIf="selectedSlots.size > 0" class="selection-footer">
+    <ion-card color="light">
+      <ion-card-content>
+        <div class="selection-info">
+          <strong>Selección:</strong>
+          <span *ngIf="getSelectedRange() as range">
+            {{ days[range.dayIndex].label }} | {{ range.horaInicio }} - {{ range.horaFin }}
+          </span>
+        </div>
+        <div class="selection-actions">
+          <ion-button fill="clear" color="medium" (click)="clearSelection()">
+            Cancelar
+          </ion-button>
+          <ion-button color="primary" (click)="guardarReserva()">
+            <ion-icon name="save-outline" slot="start"></ion-icon>
+            Guardar Reserva
+          </ion-button>
+        </div>
+      </ion-card-content>
+    </ion-card>
+  </div>
+</ion-content>

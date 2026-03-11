@@ -39,7 +39,7 @@
           },
           "configurations": {
             "production": {
-              "baseHref": "/jabas_y_parihuelas/",
+              "baseHref": "/camioneta_app/",
               "budgets": [{
                   "type": "initial",
                   "maximumWarning": "2mb",
