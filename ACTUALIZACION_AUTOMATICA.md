@@ -74,11 +74,34 @@ public function getCurrentVersion()
 
 #### 3. **Compilar el nuevo APK**:
 
+Antes de compilar release, configura la firma (una sola vez):
+
+```powershell
+cd c:\laragon\www\camioneta\frontend\android
+copy key.properties.example key.properties
+```
+
+Edita `key.properties` con tus datos reales de keystore.
+
+Si aun no tienes keystore, crea uno:
+
+```powershell
+cd c:\laragon\www\camioneta\frontend\android
+keytool -genkeypair -v -keystore release-keystore.jks -alias release -keyalg RSA -keysize 2048 -validity 10000
+```
+
 ```powershell
 cd c:\laragon\www\camioneta\frontend
 npm run build:apk
 cd android
 .\gradlew assembleRelease
+```
+
+Verificar firma del APK generado:
+
+```powershell
+cd c:\laragon\www\camioneta\frontend\android
+apksigner verify --print-certs app\build\outputs\apk\release\app-release.apk
 ```
 
 #### 4. **Subir el APK al servidor**:

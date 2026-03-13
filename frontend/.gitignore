@@ -71,3 +71,4 @@ Thumbs.db
 
 # PDF.js worker (se genera automáticamente desde node_modules)
 /src/assets/pdf.worker.min.mjs
+/android
