@@ -24,6 +24,27 @@ class AuthController extends Controller
     }
 
     /**
+     * Redirigir a la app móvil usando una página HTML intermedia.
+     * Chrome Custom Tabs no siempre manejan bien los 302 a custom schemes.
+     */
+    private function mobileRedirect(string $url)
+    {
+        $safeUrl = htmlspecialchars($url, ENT_QUOTES, 'UTF-8');
+        $html = <<<HTML
+<!DOCTYPE html>
+<html>
+<head><meta charset="utf-8"><title>Redirigiendo...</title></head>
+<body>
+<p>Redirigiendo a la aplicación...</p>
+<script>window.location.href = "{$safeUrl}";</script>
+<noscript><a href="{$safeUrl}">Toca aquí si no se abre automáticamente</a></noscript>
+</body>
+</html>
+HTML;
+        return response($html, 200)->header('Content-Type', 'text/html');
+    }
+
+    /**
      * Redirect to Microsoft OAuth
      */
     public function redirectToMicrosoft(Request $request)
@@ -88,7 +109,7 @@ class AuthController extends Controller
                 $errorMessage = urlencode('Usuario no registrado en el sistema. Contacte al administrador.');
                 
                 if ($isMobile) {
-                    return redirect()->to("camioneta://login?error={$errorMessage}");
+                    return $this->mobileRedirect("camioneta://login?error={$errorMessage}");
                 } else {
                     $frontendUrl = env('FRONTEND_URL', 'http://localhost:8100');
                     return redirect()->to("{$frontendUrl}/login?error={$errorMessage}");
@@ -100,7 +121,7 @@ class AuthController extends Controller
                 $errorMessage = urlencode('Usuario inactivo. Contacte al administrador.');
                 
                 if ($isMobile) {
-                    return redirect()->to("camioneta://login?error={$errorMessage}");
+                    return $this->mobileRedirect("camioneta://login?error={$errorMessage}");
                 } else {
                     $frontendUrl = env('FRONTEND_URL', 'http://localhost:8100');
                     return redirect()->to("{$frontendUrl}/login?error={$errorMessage}");
@@ -146,10 +167,9 @@ class AuthController extends Controller
 
             // Redirigir según el contexto (web vs móvil)
             if ($isMobile) {
-                // Usar deep link custom scheme para la app móvil
-                // Con Chrome Custom Tabs, esto cerrará automáticamente el navegador
+                // Usar HTML redirect (más confiable que 302 en Chrome Custom Tabs)
                 $appScheme = 'camioneta://auth-callback';
-                return redirect()->to(
+                return $this->mobileRedirect(
                     "{$appScheme}?token={$token}&user={$userData}"
                 );
             } else {
@@ -164,9 +184,8 @@ class AuthController extends Controller
             $errorMessage = urlencode($e->getMessage());
             
             if ($isMobile) {
-                $appScheme = 'camioneta://login';
-                return redirect()->to(
-                    "{$appScheme}?error={$errorMessage}"
+                return $this->mobileRedirect(
+                    "camioneta://login?error={$errorMessage}"
                 );
             } else {
                 $frontendUrl = env('FRONTEND_URL', 'http://localhost:8100');

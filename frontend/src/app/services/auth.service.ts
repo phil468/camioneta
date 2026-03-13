@@ -3,6 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { tap } from 'rxjs/operators';
 import { Router } from '@angular/router';
+import { LoadingController } from '@ionic/angular/standalone';
 import { environment } from '../../environments/environment';
 import { Browser } from '@capacitor/browser';
 import { App } from '@capacitor/app';
@@ -38,6 +39,7 @@ export class AuthService {
   constructor(
     private http: HttpClient,
     private router: Router,
+    private loadingController: LoadingController,
   ) {
     this.loadStoredUser();
     this.setupDeepLinkListener();
@@ -55,6 +57,12 @@ export class AuthService {
         } catch (_) {
           // Browser ya estaba cerrado o no aplica
         }
+
+        // Dismiss any loading overlay
+        try {
+          const loading = await this.loadingController.getTop();
+          if (loading) await loading.dismiss();
+        } catch (_) {}
 
         // Verificar si es callback de OAuth
         if (url.includes('auth-callback')) {
@@ -158,15 +166,23 @@ export class AuthService {
 
     if (isMobile) {
       // En móvil, usar Chrome Custom Tabs via @capacitor/browser
-      // Agregar parámetro para que el backend sepa que viene de la app
       const authUrl = `${this.apiUrl}/auth/microsoft?source=mobile_app`;
+      console.log('[Auth] Abriendo OAuth móvil:', authUrl);
+
+      // Listener para cuando el usuario cierra el browser manualmente
+      const handler = await Browser.addListener('browserFinished', async () => {
+        console.log('[Auth] Browser cerrado por el usuario');
+        try {
+          const loading = await this.loadingController.getTop();
+          if (loading) await loading.dismiss();
+        } catch (_) {}
+        handler.remove();
+      });
 
       await Browser.open({
         url: authUrl,
-        presentationStyle: 'popover',
+        windowName: '_self',
       });
-
-      // El deep link listener cerrará el browser automáticamente
     } else {
       // En web, redirect normal
       window.location.href = `${this.apiUrl}/auth/microsoft`;

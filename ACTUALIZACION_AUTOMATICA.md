@@ -121,7 +121,7 @@ cd..
 scp android/app/build/outputs/apk/release/app-release.apk john.delacruz@172.18.10.10:/var/www/camioneta/frontend/www/
 
 npm run build:web
-scp -r www/* john.delacruz@172.18.10.10:/var/www/camioneta/frontend/www/
+scp -r www/\* john.delacruz@172.18.10.10:/var/www/camioneta/frontend/www/
 
 ## 🎯 Tipos de Actualización
 

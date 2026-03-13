@@ -243,11 +243,26 @@ export class LoginPage implements OnInit {
       });
   }
 
-  loginWithMicrosoft() {
+  async loginWithMicrosoft() {
     console.log(
       'loginWithMicrosoft(): clicked, redirecting to Microsoft OAuth',
     );
-    this.authService.loginWithMicrosoft();
+
+    const loading = await this.loadingController.create({
+      message: 'Iniciando sesión...',
+      duration: 30000, // Auto-dismiss después de 30s como fallback
+    });
+    await loading.present();
+
+    try {
+      await this.authService.loginWithMicrosoft();
+      // En móvil, el deep link listener cerrará el loading
+      // En web, se hace redirect completo
+    } catch (error) {
+      console.error('loginWithMicrosoft(): error', error);
+      await loading.dismiss();
+      this.mostrarError('Error al conectar con Microsoft. Intente nuevamente.');
+    }
   }
 
   toggleForm() {
