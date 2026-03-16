@@ -109,7 +109,10 @@ export class UsoCamionetaPage implements OnInit {
   usoDetalle: UsoCamioneta | null = null;
   fotoAmpliadaUrl: string | null = null;
 
-  private storageBaseUrl = environment.apiUrl.replace(/\/api\/v1$/, '/storage/');
+  private storageBaseUrl = environment.apiUrl.replace(
+    /\/api\/v1$/,
+    '/storage/',
+  );
 
   constructor(
     private apiService: ApiService,

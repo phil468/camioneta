@@ -15,11 +15,14 @@ import { Router } from '@angular/router';
 export class AuthInterceptor implements HttpInterceptor {
   private isLoggingOut = false;
 
-  constructor(private authService: AuthService, private router: Router) {}
+  constructor(
+    private authService: AuthService,
+    private router: Router,
+  ) {}
 
   intercept(
     req: HttpRequest<any>,
-    next: HttpHandler
+    next: HttpHandler,
   ): Observable<HttpEvent<any>> {
     const token = this.authService.getToken();
 
@@ -39,21 +42,28 @@ export class AuthInterceptor implements HttpInterceptor {
 
         if (error.status === 401 && !isLogoutReq && !this.isLoggingOut) {
           this.isLoggingOut = true;
-          this.authService.logout().finally(() => this.isLoggingOut = false);
-        } else if (error.status === 403 && error.error?.logout && !this.isLoggingOut) {
+          this.authService.logout().finally(() => (this.isLoggingOut = false));
+        } else if (
+          error.status === 403 &&
+          error.error?.logout &&
+          !this.isLoggingOut
+        ) {
           this.isLoggingOut = true;
-          this.authService.logout().then(() => {
-            this.router.navigate(['/login'], {
-              queryParams: {
-                error:
-                  'Tu cuenta ha sido desactivada. Contacta al administrador.',
-              },
-              replaceUrl: true,
-            });
-          }).finally(() => this.isLoggingOut = false);
+          this.authService
+            .logout()
+            .then(() => {
+              this.router.navigate(['/login'], {
+                queryParams: {
+                  error:
+                    'Tu cuenta ha sido desactivada. Contacta al administrador.',
+                },
+                replaceUrl: true,
+              });
+            })
+            .finally(() => (this.isLoggingOut = false));
         }
         return throwError(() => error);
-      })
+      }),
     );
   }
 }

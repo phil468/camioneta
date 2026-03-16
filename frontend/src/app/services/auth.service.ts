@@ -77,14 +77,17 @@ export class AuthService {
             if (code) {
               // Intercambiar código por token+user vía API
               try {
-                const response: any = await fetch(`${this.apiUrl}/auth/exchange-code`, {
-                  method: 'POST',
-                  headers: {
-                    'Content-Type': 'application/json',
-                    'Accept': 'application/json',
+                const response: any = await fetch(
+                  `${this.apiUrl}/auth/exchange-code`,
+                  {
+                    method: 'POST',
+                    headers: {
+                      'Content-Type': 'application/json',
+                      Accept: 'application/json',
+                    },
+                    body: JSON.stringify({ code }),
                   },
-                  body: JSON.stringify({ code }),
-                });
+                );
                 const result = await response.json();
 
                 if (result.success && result.data) {
@@ -94,7 +97,9 @@ export class AuthService {
                 } else {
                   console.error('[DeepLink] Exchange failed:', result.message);
                   await this.router.navigate(['/login'], {
-                    queryParams: { error: result.message || 'Error de autenticación' },
+                    queryParams: {
+                      error: result.message || 'Error de autenticación',
+                    },
                     replaceUrl: true,
                   });
                 }
@@ -243,9 +248,9 @@ export class AuthService {
         await fetch(`${this.apiUrl}/auth/logout`, {
           method: 'POST',
           headers: {
-            'Authorization': `Bearer ${token}`,
+            Authorization: `Bearer ${token}`,
             'Content-Type': 'application/json',
-            'Accept': 'application/json',
+            Accept: 'application/json',
           },
         });
       } catch (_) {
