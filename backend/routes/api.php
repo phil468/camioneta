@@ -38,6 +38,7 @@ Route::prefix('v1/auth')->group(function () {
     Route::post('register', [AuthController::class, 'register']);
     Route::get('microsoft', [AuthController::class, 'redirectToMicrosoft']);
     Route::get('microsoft/callback', [AuthController::class, 'handleMicrosoftCallback']);
+    Route::post('exchange-code', [AuthController::class, 'exchangeAuthCode']);
 });
 
 // Rutas protegidas de autenticación

@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 use Laravel\Socialite\Facades\Socialite;
 use GuzzleHttp\Client;
+use Illuminate\Support\Facades\Cache;
 
 class AuthController extends Controller
 {
@@ -182,10 +183,26 @@ HTML;
 
             // Redirigir según el contexto (web vs móvil)
             if ($isMobile) {
-                // Usar HTML redirect (más confiable que 302 en Chrome Custom Tabs)
-                $appScheme = 'camioneta://auth-callback';
+                // Guardar token+user en cache con un código corto (evita URLs largas en deep links)
+                $authCode = Str::random(32);
+                Cache::put("auth_code_{$authCode}", [
+                    'token' => $token,
+                    'user' => [
+                        'id' => $user->id,
+                        'name' => $user->name,
+                        'email' => $user->email,
+                        'avatar' => $user->avatar,
+                        'role' => $user->role ? [
+                            'id' => $user->role->id,
+                            'nombre' => $user->role->nombre,
+                            'slug' => $user->role->slug,
+                            'permisos' => $user->role->permisos,
+                        ] : null,
+                    ],
+                ], now()->addMinutes(5));
+
                 return $this->mobileRedirect(
-                    "{$appScheme}?token={$token}&user={$userData}"
+                    "camioneta://auth-callback?code={$authCode}"
                 );
             } else {
                 // Redirigir al frontend web
@@ -209,6 +226,34 @@ HTML;
                 );
             }
         }
+    }
+
+    /**
+     * Intercambiar código temporal por token + datos de usuario.
+     * Usado por la app móvil después del deep link OAuth.
+     */
+    public function exchangeAuthCode(Request $request)
+    {
+        $request->validate(['code' => 'required|string|size:32']);
+
+        $code = $request->input('code');
+        $cacheKey = "auth_code_{$code}";
+        $authData = Cache::get($cacheKey);
+
+        if (!$authData) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Código de autenticación inválido o expirado',
+            ], 401);
+        }
+
+        // Eliminar el código (uso único)
+        Cache::forget($cacheKey);
+
+        return response()->json([
+            'success' => true,
+            'data' => $authData,
+        ]);
     }
 
     /**
