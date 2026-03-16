@@ -24,20 +24,35 @@ class AuthController extends Controller
     }
 
     /**
-     * Redirigir a la app móvil usando una página HTML intermedia.
-     * Chrome Custom Tabs no siempre manejan bien los 302 a custom schemes.
+     * Redirigir a la app móvil usando intent:// URI.
+     * Chrome Custom Tabs manejan intent:// nativamente sin mostrar
+     * el diálogo "Elegir aplicación" (ResolverActivity).
      */
     private function mobileRedirect(string $url)
     {
-        $safeUrl = htmlspecialchars($url, ENT_QUOTES, 'UTF-8');
+        // Convertir camioneta://host/path?query a intent://host/path?query#Intent;scheme=camioneta;package=pe.vanguardfresh.camioneta;end
+        $parsed = parse_url($url);
+        $host = $parsed['host'] ?? '';
+        $path = $parsed['path'] ?? '';
+        $query = isset($parsed['query']) ? '?' . $parsed['query'] : '';
+
+        $intentUrl = "intent://{$host}{$path}{$query}#Intent;scheme=camioneta;package=pe.vanguardfresh.camioneta;end";
+        $safeIntent = htmlspecialchars($intentUrl, ENT_QUOTES, 'UTF-8');
+        $safeFallback = htmlspecialchars($url, ENT_QUOTES, 'UTF-8');
+
         $html = <<<HTML
 <!DOCTYPE html>
 <html>
 <head><meta charset="utf-8"><title>Redirigiendo...</title></head>
 <body>
 <p>Redirigiendo a la aplicación...</p>
-<script>window.location.href = "{$safeUrl}";</script>
-<noscript><a href="{$safeUrl}">Toca aquí si no se abre automáticamente</a></noscript>
+<script>
+// intent:// es manejado nativamente por Chrome en Android
+window.location.href = "{$safeIntent}";
+// Fallback para navegadores que no soportan intent://
+setTimeout(function() { window.location.href = "{$safeFallback}"; }, 1000);
+</script>
+<noscript><a href="{$safeFallback}">Toca aquí si no se abre automáticamente</a></noscript>
 </body>
 </html>
 HTML;
