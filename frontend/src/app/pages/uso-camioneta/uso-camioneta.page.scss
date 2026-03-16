@@ -49,6 +49,27 @@
     border-bottom: none;
   }
 
+  .respuesta-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .respuesta-thumb {
+    width: 52px;
+    height: 52px;
+    border-radius: 6px;
+    object-fit: cover;
+    cursor: pointer;
+    border: 1px solid var(--ion-color-light-shade, #ddd);
+    flex-shrink: 0;
+  }
+
+  .respuesta-info {
+    flex: 1;
+    min-width: 0;
+  }
+
   .respuesta-header {
     display: flex;
     align-items: center;
@@ -65,5 +86,40 @@
     font-size: 13px;
     color: var(--ion-color-medium);
     font-style: italic;
+  }
+}
+
+.foto-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.9);
+  z-index: 99999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+
+  .foto-overlay-close {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    z-index: 100000;
+    --padding-start: 4px;
+    --padding-end: 4px;
+
+    ion-icon {
+      font-size: 36px;
+    }
+  }
+
+  img {
+    max-width: 92%;
+    max-height: 88%;
+    object-fit: contain;
+    border-radius: 8px;
+    cursor: default;
   }
 }

@@ -13,6 +13,8 @@ import { Router } from '@angular/router';
 
 @Injectable()
 export class AuthInterceptor implements HttpInterceptor {
+  private isLoggingOut = false;
+
   constructor(private authService: AuthService, private router: Router) {}
 
   intercept(
@@ -32,19 +34,23 @@ export class AuthInterceptor implements HttpInterceptor {
 
     return next.handle(authReq).pipe(
       catchError((error: HttpErrorResponse) => {
-        if (error.status === 401) {
-          // Token expirado o inválido
-          this.authService.logout();
-        } else if (error.status === 403 && error.error?.logout) {
-          // Usuario desactivado o eliminado
-          this.authService.logout();
-          this.router.navigate(['/login'], {
-            queryParams: {
-              error:
-                'Tu cuenta ha sido desactivada. Contacta al administrador.',
-            },
-            replaceUrl: true,
-          });
+        // No reaccionar a 401 si ya estamos cerrando sesión o si es la propia petición de logout
+        const isLogoutReq = req.url.includes('/auth/logout');
+
+        if (error.status === 401 && !isLogoutReq && !this.isLoggingOut) {
+          this.isLoggingOut = true;
+          this.authService.logout().finally(() => this.isLoggingOut = false);
+        } else if (error.status === 403 && error.error?.logout && !this.isLoggingOut) {
+          this.isLoggingOut = true;
+          this.authService.logout().then(() => {
+            this.router.navigate(['/login'], {
+              queryParams: {
+                error:
+                  'Tu cuenta ha sido desactivada. Contacta al administrador.',
+              },
+              replaceUrl: true,
+            });
+          }).finally(() => this.isLoggingOut = false);
         }
         return throwError(() => error);
       })

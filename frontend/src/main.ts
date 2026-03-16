@@ -50,10 +50,12 @@ import {
   documentText,
   eyeOutline,
   eyeOffOutline,
+  checkbox,
   checkmarkCircleOutline,
   checkmarkOutline,
   checkmark,
   calendarOutline,
+  calendar,
   personOutline,
   personCircleOutline,
   carOutline,
@@ -93,6 +95,7 @@ import {
   personCircle,
   cloudUpload,
   shieldCheckmarkOutline,
+  shieldCheckmark,
   cloudDownloadOutline,
 } from 'ionicons/icons';
 
@@ -125,10 +128,12 @@ addIcons({
   documentText,
   eyeOutline,
   eyeOffOutline,
+  checkbox,
   checkmarkCircleOutline,
   checkmarkOutline,
   checkmark,
   calendarOutline,
+  calendar,
   personOutline,
   personCircleOutline,
   carOutline,
@@ -168,6 +173,7 @@ addIcons({
   personCircle,
   cloudUpload,
   shieldCheckmarkOutline,
+  shieldCheckmark,
   cloudDownloadOutline,
 });
 

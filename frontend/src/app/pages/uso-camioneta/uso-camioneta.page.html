@@ -153,14 +153,25 @@
       </ion-card-header>
       <ion-card-content>
         <div *ngFor="let resp of usoDetalle.checklist_respuestas" class="checklist-respuesta">
-          <div class="respuesta-header">
-            <ion-icon 
-              [name]="resp.respuesta ? 'checkmark-circle-outline' : 'close-circle-outline'"
-              [color]="resp.respuesta ? 'success' : 'danger'"
-            ></ion-icon>
-            <span>{{ resp.checklist_item?.nombre }}</span>
+          <div class="respuesta-row">
+            <div class="respuesta-info">
+              <div class="respuesta-header">
+                <ion-icon 
+                  [name]="resp.respuesta ? 'checkmark-circle-outline' : 'close-circle-outline'"
+                  [color]="resp.respuesta ? 'success' : 'danger'"
+                ></ion-icon>
+                <span>{{ resp.checklist_item?.nombre }}</span>
+              </div>
+              <p *ngIf="resp.comentario" class="respuesta-comment">{{ resp.comentario }}</p>
+            </div>
+            <img 
+              *ngIf="resp.foto" 
+              [src]="getFotoUrl(resp.foto)" 
+              class="respuesta-thumb" 
+              alt="Foto" 
+              (click)="verFoto(resp.foto)"
+            />
           </div>
-          <p *ngIf="resp.comentario" class="respuesta-comment">{{ resp.comentario }}</p>
         </div>
       </ion-card-content>
     </ion-card>
@@ -178,3 +189,11 @@
     </ion-button>
   </div>
 </ion-content>
+
+<!-- Overlay foto ampliada -->
+<div class="foto-overlay" *ngIf="fotoAmpliadaUrl" (click)="cerrarFoto()">
+  <ion-button class="foto-overlay-close" fill="clear" color="light" (click)="cerrarFoto()">
+    <ion-icon name="close-circle-outline" slot="icon-only"></ion-icon>
+  </ion-button>
+  <img [src]="fotoAmpliadaUrl" alt="Foto ampliada" (click)="$event.stopPropagation()" />
+</div>

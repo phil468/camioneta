@@ -67,36 +67,60 @@ export class AuthService {
         // Verificar si es callback de OAuth
         if (url.includes('auth-callback')) {
           try {
-            const urlObj = new URL(url);
-            const token = urlObj.searchParams.get('token');
-            const userEncoded = urlObj.searchParams.get('user');
+            // Parsear query params manualmente (new URL puede fallar con custom schemes)
+            const queryString = url.split('?')[1] || '';
+            const params = new URLSearchParams(queryString);
+            const code = params.get('code');
 
-            if (token && userEncoded) {
-              // Autenticación exitosa
+            console.log('[DeepLink] code:', code ? 'presente' : 'null');
+
+            if (code) {
+              // Intercambiar código por token+user vía API
               try {
-                const userData = JSON.parse(atob(userEncoded));
-                this.setAuth(userData, token);
+                const response: any = await fetch(`${this.apiUrl}/auth/exchange-code`, {
+                  method: 'POST',
+                  headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                  },
+                  body: JSON.stringify({ code }),
+                });
+                const result = await response.json();
 
-                // Pequeño delay para asegurar que se guarde
-                await new Promise((resolve) => setTimeout(resolve, 100));
-
-                await this.router.navigate(['/home'], { replaceUrl: true });
+                if (result.success && result.data) {
+                  this.setAuth(result.data.user, result.data.token);
+                  await new Promise((resolve) => setTimeout(resolve, 100));
+                  await this.router.navigate(['/home'], { replaceUrl: true });
+                } else {
+                  console.error('[DeepLink] Exchange failed:', result.message);
+                  await this.router.navigate(['/login'], {
+                    queryParams: { error: result.message || 'Error de autenticación' },
+                    replaceUrl: true,
+                  });
+                }
               } catch (error) {
-                console.error('[DeepLink] Error parseando usuario:', error);
+                console.error('[DeepLink] Error intercambiando código:', error);
                 await this.router.navigate(['/login'], {
-                  queryParams: { error: 'Error procesando autenticación' },
+                  queryParams: { error: 'Error conectando con el servidor' },
                   replaceUrl: true,
                 });
               }
+            } else {
+              console.error('[DeepLink] Código faltante en la URL');
+              await this.router.navigate(['/login'], {
+                queryParams: { error: 'Respuesta de autenticación incompleta' },
+                replaceUrl: true,
+              });
             }
           } catch (error) {
             console.error('[DeepLink] Error procesando URL:', error);
           }
-        } else if (url.includes('login?error')) {
+        } else if (url.includes('login')) {
           // Error en OAuth
           try {
-            const urlObj = new URL(url);
-            const error = urlObj.searchParams.get('error');
+            const queryString = url.split('?')[1] || '';
+            const params = new URLSearchParams(queryString);
+            const error = params.get('error');
             await this.router.navigate(['/login'], {
               queryParams: {
                 error: decodeURIComponent(error || 'Error de autenticación'),
@@ -204,28 +228,29 @@ export class AuthService {
   async logout(): Promise<void> {
     console.log('[AuthService] logout() - START');
 
-    try {
-      // Limpiar localmente primero
-      console.log('[AuthService] Calling clearAuth()');
-      this.clearAuth();
-      console.log('[AuthService] clearAuth() - COMPLETED');
+    // Guardar el token ANTES de limpiar para poder notificar al backend
+    const token = this.getToken();
 
-      // Redirigir al login sin historial (para evitar volver atrás)
-      console.log('[AuthService] Navigating to /login with replaceUrl: true');
-      await this.router.navigate(['/login'], { replaceUrl: true });
-      console.log('[AuthService] Navigation to /login COMPLETED');
+    // Limpiar localmente primero (evita que el interceptor reaccione a 401)
+    this.clearAuth();
 
-      // Notificar al backend DESPUÉS de navegar (no bloqueante)
-      console.log('[AuthService] Sending logout request to backend');
-      this.http.post<AuthResponse>(`${this.apiUrl}/auth/logout`, {}).subscribe({
-        next: () => console.log('[AuthService] Logout exitoso en el servidor'),
-        error: (error) =>
-          console.error('[AuthService] Error en logout del servidor:', error),
-      });
-    } catch (error) {
-      console.error('[AuthService] Error in logout():', error);
-      // Asegurar que llegue a login incluso si hay error
-      await this.router.navigate(['/login'], { replaceUrl: true });
+    // Redirigir al login sin historial
+    await this.router.navigate(['/login'], { replaceUrl: true });
+
+    // Notificar al backend SOLO si teníamos token (petición directa sin interceptor)
+    if (token) {
+      try {
+        await fetch(`${this.apiUrl}/auth/logout`, {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+          },
+        });
+      } catch (_) {
+        // Ignorar errores de logout en backend
+      }
     }
 
     console.log('[AuthService] logout() - END');

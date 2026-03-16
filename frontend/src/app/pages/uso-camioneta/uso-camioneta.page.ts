@@ -48,6 +48,7 @@ import {
   UsoChecklistRespuesta,
 } from '../../services/api.service';
 import { PermisosService } from '../../services/permisos.service';
+import { environment } from '../../../environments/environment';
 
 interface ChecklistFormItem {
   checklist_item_id: number;
@@ -106,6 +107,9 @@ export class UsoCamionetaPage implements OnInit {
 
   // Detalle
   usoDetalle: UsoCamioneta | null = null;
+  fotoAmpliadaUrl: string | null = null;
+
+  private storageBaseUrl = environment.apiUrl.replace(/\/api\/v1$/, '/storage/');
 
   constructor(
     private apiService: ApiService,
@@ -357,5 +361,17 @@ export class UsoCamionetaPage implements OnInit {
   esPropietario(uso: UsoCamioneta): boolean {
     const userId = this.permisos.getCurrentUserId();
     return uso.user_id === userId;
+  }
+
+  getFotoUrl(foto: string): string {
+    return this.storageBaseUrl + foto;
+  }
+
+  verFoto(foto: string) {
+    this.fotoAmpliadaUrl = this.getFotoUrl(foto);
+  }
+
+  cerrarFoto() {
+    this.fotoAmpliadaUrl = null;
   }
 }
