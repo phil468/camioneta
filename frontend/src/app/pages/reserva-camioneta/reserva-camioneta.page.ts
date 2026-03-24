@@ -122,10 +122,10 @@ export class ReservaCamionetaPage implements OnInit, OnDestroy {
     this.generateTimeSlots();
     this.loadCamionetas();
 
-    // Actualizar cada 30 segundos
+    // Actualizar cada 30 segundos (silencioso para no perder scroll)
     this.refreshInterval = setInterval(() => {
       if (this.selectedCamionetaId) {
-        this.loadReservas();
+        this.loadReservas(true);
       }
     }, 30000);
   }
@@ -164,7 +164,7 @@ export class ReservaCamionetaPage implements OnInit, OnDestroy {
     this.loadReservas();
   }
 
-  loadReservas() {
+  loadReservas(silent = false) {
     if (!this.selectedCamionetaId) return;
 
     const today = new Date();
@@ -174,7 +174,9 @@ export class ReservaCamionetaPage implements OnInit, OnDestroy {
     const fechaInicio = this.formatDate(today);
     const fechaFin = this.formatDate(endDate);
 
-    this.loading = true;
+    if (!silent) {
+      this.loading = true;
+    }
     this.apiService
       .getSlotsOcupados(this.selectedCamionetaId, fechaInicio, fechaFin)
       .subscribe({
@@ -190,7 +192,7 @@ export class ReservaCamionetaPage implements OnInit, OnDestroy {
   }
 
   buildDaysGrid(startDate: Date, reservas: Reserva[]) {
-    this.days = [];
+    const newDays: DaySlots[] = [];
     const now = new Date();
 
     for (let d = 0; d < 10; d++) {
@@ -281,13 +283,15 @@ export class ReservaCamionetaPage implements OnInit, OnDestroy {
         'Diciembre',
       ];
 
-      this.days.push({
+      newDays.push({
         fecha,
         fechaStr,
         label: `${dayNames[fecha.getDay()]} ${fecha.getDate()} de ${monthNames[fecha.getMonth()]}`,
         slots,
       });
     }
+
+    this.days = newDays;
   }
 
   // === Selección de slots por clic/arrastre ===

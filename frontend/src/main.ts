@@ -97,6 +97,7 @@ import {
   shieldCheckmarkOutline,
   shieldCheckmark,
   cloudDownloadOutline,
+  cloudDownload
 } from 'ionicons/icons';
 
 addIcons({
@@ -175,6 +176,7 @@ addIcons({
   shieldCheckmarkOutline,
   shieldCheckmark,
   cloudDownloadOutline,
+  cloudDownload
 });
 
 bootstrapApplication(AppComponent, {
