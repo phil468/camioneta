@@ -122,10 +122,8 @@ class ReservaController extends Controller
 
         $reserva->load(['user', 'camioneta']);
 
-        // Enviar notificación a Telegram, si no es local
-        if (!app()->isLocal()) {
-            $this->telegramService->enviarNotificacionReserva($reserva);
-        }
+        // Enviar notificación a Telegram
+        $this->telegramService->enviarNotificacionReserva($reserva);
 
         return response()->json(['success' => true, 'data' => $reserva], 201);
     }

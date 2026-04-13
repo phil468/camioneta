@@ -16,7 +16,9 @@ class TelegramService
     {
         $this->botToken = config('services.telegram.bot_token');
         $this->chatId = config('services.telegram.chat_id');
-        $this->enabled = !empty($this->botToken) && !empty($this->chatId);
+        $this->enabled = config('services.telegram.enabled', false)
+            && !empty($this->botToken)
+            && !empty($this->chatId);
     }
 
     public function enviarNotificacionReserva(Reserva $reserva): bool
@@ -77,5 +79,13 @@ class TelegramService
             Log::error('Excepción enviando mensaje de Telegram: ' . $e->getMessage());
             return false;
         }
+    }
+
+    public function enviarMensajePrueba(): bool
+    {
+        $mensaje = "🔔 *PRUEBA DE CONEXIÓN*\n\n";
+        $mensaje .= "✅ El bot de Telegram está funcionando correctamente.\n";
+        $mensaje .= "📅 Fecha: " . now()->format('d/m/Y H:i:s');
+        return $this->enviarMensaje($mensaje);
     }
 }
