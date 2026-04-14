@@ -74,11 +74,11 @@
             [class.ocupado]="slot.estado === 'ocupado'"
             [class.seleccionado]="slot.estado === 'seleccionado'"
             [class.pasado]="slot.estado === 'pasado'"
+            [attr.data-tooltip]="slot.estado === 'ocupado' ? slot.reservadoPor : null"
             (mousedown)="onSlotMouseDown(dIdx, sIdx)"
             (mouseenter)="onSlotMouseEnter(dIdx, sIdx)"
             (mouseup)="onSlotMouseUp()"
             (click)="onSlotClick(dIdx, sIdx)"
-            [title]="slot.estado === 'ocupado' ? slot.reservadoPor || '' : slot.display"
           >
             {{ slot.display }}
           </div>

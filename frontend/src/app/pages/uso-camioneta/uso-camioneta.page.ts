@@ -105,6 +105,9 @@ export class UsoCamionetaPage implements OnInit {
   observaciones = '';
   checklistForm: ChecklistFormItem[] = [];
 
+  // Guard contra doble-submit
+  guardando = false;
+
   // Detalle
   usoDetalle: UsoCamioneta | null = null;
   fotoAmpliadaUrl: string | null = null;
@@ -223,6 +226,8 @@ export class UsoCamionetaPage implements OnInit {
   }
 
   async guardarUso() {
+    if (this.guardando) return;
+
     if (!this.selectedCamionetaId) {
       const toast = await this.toastController.create({
         message: 'Selecciona una camioneta',
@@ -233,30 +238,45 @@ export class UsoCamionetaPage implements OnInit {
       return;
     }
 
+    this.guardando = true;
     const loading = await this.loadingController.create({
       message: 'Guardando...',
     });
     await loading.present();
 
-    const data = {
-      camioneta_id: this.selectedCamionetaId,
-      observaciones: this.observaciones || null,
-      checklist: this.checklistForm.map((item) => ({
-        checklist_item_id: item.checklist_item_id,
-        respuesta: item.respuesta,
-        comentario: item.comentario || null,
-      })),
-    };
+    const formData = new FormData();
+    formData.append('camioneta_id', this.selectedCamionetaId.toString());
+    if (this.observaciones) {
+      formData.append('observaciones', this.observaciones);
+    }
 
-    this.apiService.createUsoCamioneta(data).subscribe({
-      next: async (res) => {
+    for (let i = 0; i < this.checklistForm.length; i++) {
+      const item = this.checklistForm[i];
+      formData.append(
+        `checklist[${i}][checklist_item_id]`,
+        item.checklist_item_id.toString(),
+      );
+      formData.append(
+        `checklist[${i}][respuesta]`,
+        item.respuesta ? '1' : '0',
+      );
+      if (item.comentario) {
+        formData.append(`checklist[${i}][comentario]`, item.comentario);
+      }
+      if (item.foto) {
+        const response = await fetch(item.foto);
+        const blob = await response.blob();
+        const file = new File([blob], `checklist_${i}.jpg`, {
+          type: blob.type || 'image/jpeg',
+        });
+        formData.append(`foto_${i}`, file);
+      }
+    }
+
+    this.apiService.createUsoCamionetaConFotos(formData).subscribe({
+      next: async () => {
         await loading.dismiss();
-
-        // Subir fotos si existen
-        if (res.data) {
-          await this.subirFotos(res.data);
-        }
-
+        this.guardando = false;
         const toast = await this.toastController.create({
           message: 'Uso registrado. Estado: EN USO',
           duration: 3000,
@@ -267,6 +287,7 @@ export class UsoCamionetaPage implements OnInit {
       },
       error: async (err) => {
         await loading.dismiss();
+        this.guardando = false;
         const errorMsg = err.error?.message || 'Error al guardar';
         const alert = await this.alertController.create({
           header: 'Error',
@@ -276,29 +297,6 @@ export class UsoCamionetaPage implements OnInit {
         await alert.present();
       },
     });
-  }
-
-  private async subirFotos(uso: UsoCamioneta) {
-    if (!uso.checklist_respuestas) return;
-
-    for (let i = 0; i < this.checklistForm.length; i++) {
-      const formItem = this.checklistForm[i];
-      if (formItem.foto && uso.checklist_respuestas[i]) {
-        // Convertir dataUrl a File
-        const blob = await fetch(formItem.foto).then((r) => r.blob());
-        const file = new File([blob], `checklist_${uso.id}_${i}.jpg`, {
-          type: 'image/jpeg',
-        });
-
-        try {
-          await this.apiService
-            .subirFotoChecklist(uso.id, uso.checklist_respuestas[i].id!, file)
-            .toPromise();
-        } catch (err) {
-          console.error('Error subiendo foto:', err);
-        }
-      }
-    }
   }
 
   verDetalle(uso: UsoCamioneta) {
@@ -313,44 +311,44 @@ export class UsoCamionetaPage implements OnInit {
         '¿Deseas finalizar el uso de la camioneta? Se registrará la hora de finalización.',
       buttons: [
         { text: 'Cancelar', role: 'cancel' },
-        {
-          text: 'Finalizar',
-          handler: async () => {
-            const loading = await this.loadingController.create({
-              message: 'Finalizando...',
-            });
-            await loading.present();
-
-            this.apiService.finalizarUsoCamioneta(uso.id).subscribe({
-              next: async (res) => {
-                await loading.dismiss();
-                const toast = await this.toastController.create({
-                  message: 'Uso finalizado correctamente',
-                  duration: 3000,
-                  color: 'success',
-                });
-                await toast.present();
-
-                if (this.vista === 'detalle' && res.data) {
-                  this.usoDetalle = res.data;
-                }
-                this.loadUsos();
-              },
-              error: async (err) => {
-                await loading.dismiss();
-                const errorAlert = await this.alertController.create({
-                  header: 'Error',
-                  message: err.error?.message || 'Error al finalizar',
-                  buttons: ['OK'],
-                });
-                await errorAlert.present();
-              },
-            });
-          },
-        },
+        { text: 'Finalizar', role: 'confirm' },
       ],
     });
     await alert.present();
+    const { role } = await alert.onDidDismiss();
+
+    if (role !== 'confirm') return;
+
+    const loading = await this.loadingController.create({
+      message: 'Finalizando...',
+    });
+    await loading.present();
+
+    this.apiService.finalizarUsoCamioneta(uso.id).subscribe({
+      next: async (res) => {
+        await loading.dismiss();
+        const toast = await this.toastController.create({
+          message: 'Uso finalizado correctamente',
+          duration: 3000,
+          color: 'success',
+        });
+        await toast.present();
+
+        if (this.vista === 'detalle' && res.data) {
+          this.usoDetalle = res.data;
+        }
+        this.loadUsos();
+      },
+      error: async (err) => {
+        await loading.dismiss();
+        const errorAlert = await this.alertController.create({
+          header: 'Error',
+          message: err.error?.message || 'Error al finalizar',
+          buttons: ['OK'],
+        });
+        await errorAlert.present();
+      },
+    });
   }
 
   getEstadoColor(estado: string): string {

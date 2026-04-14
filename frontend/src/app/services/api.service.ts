@@ -307,6 +307,15 @@ export class ApiService {
     );
   }
 
+  createUsoCamionetaConFotos(
+    formData: FormData,
+  ): Observable<ApiResponse<UsoCamioneta>> {
+    return this.http.post<ApiResponse<UsoCamioneta>>(
+      `${this.apiUrl}/usos-camioneta`,
+      formData,
+    );
+  }
+
   updateUsoCamioneta(
     id: number,
     data: any,

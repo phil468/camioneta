@@ -330,7 +330,12 @@ export class ReservaCamionetaPage implements OnInit, OnDestroy {
     }
 
     const slot = this.days[dayIndex].slots[slotIndex];
-    if (slot.estado === 'ocupado' || slot.estado === 'pasado') return;
+    if (slot.estado === 'ocupado' || slot.estado === 'pasado') {
+      if (slot.estado === 'ocupado' && slot.reservadoPor) {
+        this.mostrarInfoReserva(slot.reservadoPor);
+      }
+      return;
+    }
 
     // Si ya hay una selección en otro día, limpiar
     if (this.selectedSlots.size > 0) {
@@ -423,6 +428,16 @@ export class ReservaCamionetaPage implements OnInit, OnDestroy {
     this.selectionStart = null;
     this.selectionEnd = null;
     this.refreshSlotStates();
+  }
+
+  async mostrarInfoReserva(info: string) {
+    const toast = await this.toastController.create({
+      message: `📋 Reservado por: ${info}`,
+      duration: 2500,
+      position: 'top',
+      color: 'medium',
+    });
+    await toast.present();
   }
 
   getSelectedRange(): {

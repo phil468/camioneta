@@ -121,9 +121,9 @@
       <ion-textarea [(ngModel)]="observaciones" placeholder="Observaciones opcionales..."></ion-textarea>
     </ion-item>
 
-    <ion-button expand="block" class="ion-margin-top" (click)="guardarUso()">
+    <ion-button expand="block" class="ion-margin-top" [disabled]="guardando" (click)="guardarUso()">
       <ion-icon name="save-outline" slot="start"></ion-icon>
-      Guardar e Iniciar Uso
+      {{ guardando ? 'Guardando...' : 'Guardar e Iniciar Uso' }}
     </ion-button>
   </div>
 

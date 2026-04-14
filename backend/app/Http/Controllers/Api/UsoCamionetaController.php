@@ -8,6 +8,9 @@ use App\Models\UsoChecklistRespuesta;
 use App\Models\ChecklistItem;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 
 class UsoCamionetaController extends Controller
 {
@@ -32,7 +35,7 @@ class UsoCamionetaController extends Controller
     }
 
     /**
-     * Iniciar uso de camioneta con checklist
+     * Iniciar uso de camioneta con checklist y fotos (atómico)
      */
     public function store(Request $request)
     {
@@ -42,27 +45,48 @@ class UsoCamionetaController extends Controller
             'observaciones' => 'nullable|string',
             'checklist' => 'required|array',
             'checklist.*.checklist_item_id' => 'required|exists:checklist_items,id',
-            'checklist.*.respuesta' => 'required|boolean',
+            'checklist.*.respuesta' => 'required',
             'checklist.*.comentario' => 'nullable|string',
         ]);
 
-        $uso = UsoCamioneta::create([
-            'user_id' => $request->user()->id,
-            'camioneta_id' => $request->camioneta_id,
-            'reserva_id' => $request->reserva_id,
-            'hora_inicio' => Carbon::now(),
-            'estado' => 'en_uso',
-            'observaciones' => $request->observaciones,
-        ]);
-
-        // Guardar checklist respuestas
-        foreach ($request->checklist as $item) {
-            UsoChecklistRespuesta::create([
-                'uso_camioneta_id' => $uso->id,
-                'checklist_item_id' => $item['checklist_item_id'],
-                'respuesta' => $item['respuesta'],
-                'comentario' => $item['comentario'] ?? null,
+        // Transacción sin fotos: solo datos en BD
+        $uso = DB::transaction(function () use ($request) {
+            $uso = UsoCamioneta::create([
+                'user_id' => $request->user()->id,
+                'camioneta_id' => $request->camioneta_id,
+                'reserva_id' => $request->reserva_id,
+                'hora_inicio' => Carbon::now(),
+                'estado' => 'en_uso',
+                'observaciones' => $request->observaciones,
             ]);
+
+            foreach ($request->checklist as $index => $item) {
+                UsoChecklistRespuesta::create([
+                    'uso_camioneta_id' => $uso->id,
+                    'checklist_item_id' => $item['checklist_item_id'],
+                    'respuesta' => filter_var($item['respuesta'], FILTER_VALIDATE_BOOLEAN),
+                    'comentario' => $item['comentario'] ?? null,
+                ]);
+            }
+
+            return $uso;
+        });
+
+        // Fotos después del commit: campos planos foto_0, foto_1, etc.
+        $uso->load('checklistRespuestas');
+        $respuestas = $uso->checklistRespuestas->values();
+
+        foreach ($request->checklist as $index => $item) {
+            $fileKey = "foto_{$index}";
+            if ($request->hasFile($fileKey) && isset($respuestas[$index])) {
+                $file = $request->file($fileKey);
+                if ($file->isValid()) {
+                    $extension = $file->guessExtension() ?: 'jpg';
+                    $filename = 'checklist_fotos/' . Str::random(40) . '.' . $extension;
+                    Storage::disk('public')->put($filename, file_get_contents($file->getPathname()));
+                    $respuestas[$index]->update(['foto' => $filename]);
+                }
+            }
         }
 
         $uso->load(['user', 'camioneta', 'reserva', 'checklistRespuestas.checklistItem']);
