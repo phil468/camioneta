@@ -2,7 +2,7 @@
   display: flex;
   flex-wrap: wrap;
   gap: 12px;
-  padding: 8px 0;
+  padding: 8px 16px;
   font-size: 13px;
 
   .legend-item {
@@ -20,15 +20,24 @@
 
     &.disponible {
       background: #fff;
+      border-color: #C5F6D4;
+      // background: #fff;
     }
     &.ocupado {
-      background: #ccc;
+      background: #D8DEE3;
+      border-color: #BCC3CB;
     }
     &.seleccionado {
-      background: var(--ion-color-primary, #3880ff);
+      background: var(--ion-color-primary, #00593E);
+      border-color: var(--ion-color-primary, #00593E);
+    }
+    &.propio {
+    background: #FEF4CB;
+    border-color: #F8D464;
     }
     &.pasado {
-      background: #f0f0f0;
+      background: #F8F9FA;
+      border-color: #D8DEE3;
     }
   }
 }
@@ -71,16 +80,18 @@
 
   &.disponible {
     background: #fff;
-    color: #333;
+    color: #055E49;
+    border-color: #C5F6D4;
 
     &:hover {
-      background: #e3f2fd;
+      background: #C5F6D4;
     }
   }
 
   &.ocupado {
-    background: #e0e0e0;
-    color: #999;
+    background: #D8DEE3;
+    color: #637381;
+    border-color: #BCC3CB;
     cursor: not-allowed;
     position: relative;
 
@@ -114,14 +125,55 @@
   }
 
   &.seleccionado {
-    background: var(--ion-color-primary, #3880ff);
+    background: var(--ion-color-primary, #00593E);
     color: #fff;
-    border-color: var(--ion-color-primary, #3880ff);
+    border-color: var(--ion-color-primary, #00593E);
+  }
+
+  &.propio {
+    background: #FEF4CB;
+    color: #5C4200;
+    border-color: #F8D464;
+    cursor: pointer;
+    position: relative;
+
+    &:hover {
+      background: #f5c832;
+    }
+
+    &[data-tooltip]:hover::after {
+      content: attr(data-tooltip);
+      position: absolute;
+      bottom: calc(100% + 6px);
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(0, 0, 0, 0.85);
+      color: #fff;
+      padding: 6px 10px;
+      border-radius: 6px;
+      font-size: 12px;
+      white-space: nowrap;
+      z-index: 200;
+      pointer-events: none;
+    }
+
+    &[data-tooltip]:hover::before {
+      content: '';
+      position: absolute;
+      bottom: calc(100% + 2px);
+      left: 50%;
+      transform: translateX(-50%);
+      border: 4px solid transparent;
+      border-top-color: rgba(0, 0, 0, 0.85);
+      z-index: 200;
+      pointer-events: none;
+    }
   }
 
   &.pasado {
-    background: #f5f5f5;
-    color: #bbb;
+    background: #F8F9FA;
+    color: #D8DEE3;
+    border-color: #D8DEE3;
     cursor: not-allowed;
   }
 }

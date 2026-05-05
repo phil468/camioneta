@@ -35,12 +35,15 @@
   </div>
 
   <!-- Leyenda -->
-  <div class="legend ion-padding-horizontal">
+  <div class="legend">
     <span class="legend-item">
       <span class="legend-color disponible"></span> Disponible
     </span>
     <span class="legend-item">
       <span class="legend-color ocupado"></span> Ocupado
+    </span>
+    <span class="legend-item">
+      <span class="legend-color propio"></span> Mis reservas
     </span>
     <span class="legend-item">
       <span class="legend-color seleccionado"></span> Seleccionado
@@ -73,8 +76,9 @@
             [class.disponible]="slot.estado === 'disponible'"
             [class.ocupado]="slot.estado === 'ocupado'"
             [class.seleccionado]="slot.estado === 'seleccionado'"
+            [class.propio]="slot.estado === 'propio'"
             [class.pasado]="slot.estado === 'pasado'"
-            [attr.data-tooltip]="slot.estado === 'ocupado' ? slot.reservadoPor : null"
+            [attr.data-tooltip]="(slot.estado === 'ocupado' || slot.estado === 'propio') ? slot.reservadoPor : null"
             (mousedown)="onSlotMouseDown(dIdx, sIdx)"
             (mouseenter)="onSlotMouseEnter(dIdx, sIdx)"
             (mouseup)="onSlotMouseUp()"

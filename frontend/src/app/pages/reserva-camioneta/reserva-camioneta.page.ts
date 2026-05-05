@@ -32,6 +32,7 @@ import {
   saveOutline,
   refreshOutline,
   timeOutline,
+  trashOutline,
 } from 'ionicons/icons';
 import { ApiService, Camioneta, Reserva } from '../../services/api.service';
 import { PermisosService } from '../../services/permisos.service';
@@ -51,7 +52,7 @@ interface DaySlots {
 interface SlotStatus {
   time: string;
   display: string;
-  estado: 'disponible' | 'ocupado' | 'seleccionado' | 'pasado';
+  estado: 'disponible' | 'ocupado' | 'seleccionado' | 'pasado' | 'propio';
   reserva?: Reserva;
   reservadoPor?: string;
 }
@@ -115,6 +116,7 @@ export class ReservaCamionetaPage implements OnInit, OnDestroy {
       saveOutline,
       refreshOutline,
       timeOutline,
+      trashOutline,
     });
   }
 
@@ -233,12 +235,16 @@ export class ReservaCamionetaPage implements OnInit, OnDestroy {
           const rFin = reservaOcupando.hora_fin
             ? reservaOcupando.hora_fin.substring(0, 5)
             : '';
+          const currentUserId = this.permisos.getCurrentUserId();
+          const esPropia = currentUserId !== null && reservaOcupando.user_id === currentUserId;
           return {
             time: ts.time,
             display: ts.display,
-            estado: 'ocupado' as const,
+            estado: esPropia ? ('propio' as const) : ('ocupado' as const),
             reserva: reservaOcupando,
-            reservadoPor: `${reservaOcupando.user?.name || 'Ocupado'} (${rInicio}-${rFin})`,
+            reservadoPor: esPropia
+              ? `Tu reserva (${rInicio}-${rFin})`
+              : `${reservaOcupando.user?.name || 'Ocupado'} (${rInicio}-${rFin})`,
           };
         }
 
@@ -297,7 +303,7 @@ export class ReservaCamionetaPage implements OnInit, OnDestroy {
   // === Selección de slots por clic/arrastre ===
   onSlotMouseDown(dayIndex: number, slotIndex: number) {
     const slot = this.days[dayIndex].slots[slotIndex];
-    if (slot.estado === 'ocupado' || slot.estado === 'pasado') return;
+    if (slot.estado === 'ocupado' || slot.estado === 'pasado' || slot.estado === 'propio') return;
 
     this.isDragging = false;
     this.isSelecting = true;
@@ -330,9 +336,11 @@ export class ReservaCamionetaPage implements OnInit, OnDestroy {
     }
 
     const slot = this.days[dayIndex].slots[slotIndex];
-    if (slot.estado === 'ocupado' || slot.estado === 'pasado') {
+    if (slot.estado === 'ocupado' || slot.estado === 'pasado' || slot.estado === 'propio') {
       if (slot.estado === 'ocupado' && slot.reservadoPor) {
         this.mostrarInfoReserva(slot.reservadoPor);
+      } else if (slot.estado === 'propio' && slot.reserva) {
+        this.mostrarOpcionesReservaPropia(slot.reserva);
       }
       return;
     }
@@ -403,7 +411,7 @@ export class ReservaCamionetaPage implements OnInit, OnDestroy {
 
     for (let i = start; i <= end; i++) {
       const slot = this.days[dayIndex].slots[i];
-      if (slot.estado !== 'ocupado' && slot.estado !== 'pasado') {
+        if (slot.estado !== 'ocupado' && slot.estado !== 'pasado' && slot.estado !== 'propio') {
         this.selectedSlots.add(`${dayIndex}-${i}`);
       }
     }
@@ -414,7 +422,7 @@ export class ReservaCamionetaPage implements OnInit, OnDestroy {
   private refreshSlotStates() {
     this.days.forEach((day, dIdx) => {
       day.slots.forEach((slot, sIdx) => {
-        if (slot.estado === 'ocupado' || slot.estado === 'pasado') return;
+        if (slot.estado === 'ocupado' || slot.estado === 'pasado' || slot.estado === 'propio') return;
         const key = `${dIdx}-${sIdx}`;
         slot.estado = this.selectedSlots.has(key)
           ? 'seleccionado'
@@ -428,6 +436,56 @@ export class ReservaCamionetaPage implements OnInit, OnDestroy {
     this.selectionStart = null;
     this.selectionEnd = null;
     this.refreshSlotStates();
+  }
+
+  async mostrarOpcionesReservaPropia(reserva: Reserva) {
+    const rInicio = reserva.hora_inicio ? reserva.hora_inicio.substring(0, 5) : '';
+    const rFin = reserva.hora_fin ? reserva.hora_fin.substring(0, 5) : '';
+    const alert = await this.alertController.create({
+      header: 'Tu Reserva',
+      // formatear fecha para que se vea bien
+      message: `📋 ${reserva.camioneta?.nombre || 'Camioneta'} | ${reserva.fecha.substring(0, 10)} | ${rInicio} - ${rFin}`,
+      // message: ` | ${rInicio} - ${rFin}`,
+      buttons: [
+        { text: 'Cerrar', role: 'cancel' },
+        {
+          text: 'Eliminar',
+          role: 'destructive',
+          cssClass: 'alert-button-danger',
+          handler: () => {
+            this.eliminarReservaPropia(reserva.id);
+          },
+        },
+      ],
+    });
+    await alert.present();
+  }
+
+  async eliminarReservaPropia(id: number) {
+    const loading = await this.loadingController.create({ message: 'Eliminando reserva...' });
+    await loading.present();
+    this.apiService.deleteReserva(id).subscribe({
+      next: async () => {
+        await loading.dismiss();
+        const toast = await this.toastController.create({
+          message: 'Reserva eliminada correctamente',
+          duration: 2500,
+          color: 'success',
+        });
+        await toast.present();
+        this.loadReservas();
+      },
+      error: async (err) => {
+        await loading.dismiss();
+        const msg = err.error?.message || 'Error al eliminar la reserva';
+        const toast = await this.toastController.create({
+          message: msg,
+          duration: 3000,
+          color: 'danger',
+        });
+        await toast.present();
+      },
+    });
   }
 
   async mostrarInfoReserva(info: string) {
