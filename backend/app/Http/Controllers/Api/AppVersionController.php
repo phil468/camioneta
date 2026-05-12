@@ -15,15 +15,15 @@ class AppVersionController extends Controller
         return response()->json([
             'success' => true,
             'data' => [
-                'version' => '1.1.6', // Actualiza esto cada vez que publiques una nueva versión
-                'versionCode' => 6, // Incrementa esto en cada release
+                'version' => '1.1.7', // Actualiza esto cada vez que publiques una nueva versión
+                'versionCode' => 7, // Incrementa esto en cada release
                 'downloadUrl' => env('FRONTEND_URL', 'https://apps.vanguardfresh.pe/camioneta_app') . '/app-release.apk',
-                'forceUpdate' => true, // Cambia a true si es una actualización crítica
+                'forceUpdate' => false, // Cambia a true si es una actualización crítica
                 //frontend\android\app\build.gradle tambien debe cambiar en versionCode y versionName
-                'releaseNotes' => [                    
-                    'Se añade información emergente para mostrar los detalles de la reserva',
-                    'Se implementa una protección contra el envío duplicado en uso de camioneta',
-                    'Se refactoriza el método para gestionar la carga de archivos'
+                'releaseNotes' => [
+                    //ultimos cambios en git log --oneline -n 5
+                    'Mejora para eliminar mi reserva',
+                    'Mejoras en la interfaz de usuario',
                 ],
             ],
         ]);
