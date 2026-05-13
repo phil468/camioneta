@@ -13,7 +13,7 @@ class AppVersionController extends Controller
     public function getCurrentVersion()
     {
         $frontendBaseUrl = rtrim(env('FRONTEND_URL', 'https://apps.vanguardfresh.pe/camioneta_app'), '/');
-        $downloadUrl = env('APP_DOWNLOAD_URL', $frontendBaseUrl . '/app-release.apk');
+        $downloadUrl = env('APP_DOWNLOAD_URL', $frontendBaseUrl . '/app-release-1-1-8.apk');
 
         return response()->json([
             'success' => true,
