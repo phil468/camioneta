@@ -21,7 +21,6 @@ import {
 import { AuthService } from './services/auth.service';
 import { PermisosService } from './services/permisos.service';
 import { VersionCheckService } from './services/version-check.service';
-import { Title } from 'chart.js';
 
 @Component({
   selector: 'app-root',
@@ -154,8 +153,10 @@ export class AppComponent {
       this.user = user;
     });
 
-    // Iniciar verificación periódica de actualizaciones
-    this.versionCheckService.startPeriodicCheck();
+    // Evita carga pesada durante los primeros segundos del arranque.
+    setTimeout(() => {
+      this.versionCheckService.startPeriodicCheck();
+    }, 15000);
   }
 
   /**
