@@ -12,12 +12,15 @@ class AppVersionController extends Controller
      */
     public function getCurrentVersion()
     {
+        $frontendBaseUrl = rtrim(env('FRONTEND_URL', 'https://apps.vanguardfresh.pe/camioneta_app'), '/');
+        $downloadUrl = env('APP_DOWNLOAD_URL', $frontendBaseUrl . '/app-release.apk');
+
         return response()->json([
             'success' => true,
             'data' => [
                 'version' => '1.1.7', // Actualiza esto cada vez que publiques una nueva versión
                 'versionCode' => 7, // Incrementa esto en cada release
-                'downloadUrl' => env('FRONTEND_URL', 'https://apps.vanguardfresh.pe/camioneta_app') . '/app-release.apk',
+                'downloadUrl' => $downloadUrl,
                 'forceUpdate' => false, // Cambia a true si es una actualización crítica
                 //frontend\android\app\build.gradle tambien debe cambiar en versionCode y versionName
                 'releaseNotes' => [
