@@ -30,7 +30,7 @@
         </ion-menu-toggle>
 
         <!-- Verificar versión -->
-        <ion-menu-toggle auto-hide="false">
+        <ion-menu-toggle auto-hide="false" *ngIf="isNativeApp">
           <ion-item button (click)="checkVersion()" lines="none" class="version-item">
             <ion-icon name="cloud-download" slot="start" color="tertiary"></ion-icon>
             <ion-label color="tertiary">Verificar versión</ion-label>

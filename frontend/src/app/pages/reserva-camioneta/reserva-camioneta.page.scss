@@ -95,6 +95,16 @@
     cursor: not-allowed;
     position: relative;
 
+    &.ocupado-admin {
+      cursor: pointer;
+      background: #ced8e1;
+      border-color: #9fb0bf;
+
+      &:hover {
+        background: #c4d1dc;
+      }
+    }
+
     &[data-tooltip]:hover::after {
       content: attr(data-tooltip);
       position: absolute;

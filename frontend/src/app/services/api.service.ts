@@ -78,6 +78,7 @@ export interface Role {
     uso_camioneta?: boolean;
     configuracion?: boolean;
     gestion_usuarios?: boolean;
+    eliminar_reserva_todos?: boolean;
     auditoria?: boolean;
     ver_todo?: boolean;
   };

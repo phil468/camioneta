@@ -75,6 +75,7 @@
             class="slot-cell"
             [class.disponible]="slot.estado === 'disponible'"
             [class.ocupado]="slot.estado === 'ocupado'"
+            [class.ocupado-admin]="slot.estado === 'ocupado' && permisos.puedeEliminarReservaTodos()"
             [class.seleccionado]="slot.estado === 'seleccionado'"
             [class.propio]="slot.estado === 'propio'"
             [class.pasado]="slot.estado === 'pasado'"

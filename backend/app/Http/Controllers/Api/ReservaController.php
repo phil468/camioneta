@@ -186,17 +186,27 @@ class ReservaController extends Controller
 
     public function destroy(Request $request, $id)
     {
-        $reserva = Reserva::findOrFail($id);
+        $reserva = Reserva::with('user')->findOrFail($id);
+        $currentUser = $request->user();
+        $esPropia = $reserva->user_id === $currentUser->id;
+        $puedeEliminarTodas = $currentUser->tienePermiso('eliminar_reserva_todos');
 
-        // Solo el dueño puede eliminar su reserva
-        if ($reserva->user_id !== $request->user()->id) {
+        // Solo el dueño puede eliminar su reserva, salvo que tenga permiso explícito.
+        if (!$esPropia && !$puedeEliminarTodas) {
             return response()->json([
                 'success' => false,
                 'message' => 'Solo puedes eliminar tus propias reservas'
             ], 403);
         }
 
+        // Se elimina por modelo para que Laravel Auditing registre el evento deleted.
+        $ownerName = $reserva->user?->name ?? 'otro usuario';
         $reserva->delete();
-        return response()->json(['success' => true, 'message' => 'Reserva eliminada']);
+
+        $message = $esPropia
+            ? 'Reserva eliminada'
+            : "Reserva de {$ownerName} eliminada";
+
+        return response()->json(['success' => true, 'message' => $message]);
     }
 }

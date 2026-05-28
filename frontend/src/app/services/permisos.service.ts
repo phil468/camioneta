@@ -33,6 +33,10 @@ export class PermisosService {
     return this.tienePermiso('reserva_camioneta');
   }
 
+  puedeEliminarReservaTodos(): boolean {
+    return this.tienePermiso('eliminar_reserva_todos');
+  }
+
   puedeUsarCamioneta(): boolean {
     return this.tienePermiso('uso_camioneta');
   }

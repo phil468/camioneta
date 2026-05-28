@@ -236,7 +236,8 @@ export class ReservaCamionetaPage implements OnInit, OnDestroy {
             ? reservaOcupando.hora_fin.substring(0, 5)
             : '';
           const currentUserId = this.permisos.getCurrentUserId();
-          const esPropia = currentUserId !== null && reservaOcupando.user_id === currentUserId;
+          const esPropia =
+            currentUserId !== null && reservaOcupando.user_id === currentUserId;
           return {
             time: ts.time,
             display: ts.display,
@@ -303,7 +304,12 @@ export class ReservaCamionetaPage implements OnInit, OnDestroy {
   // === Selección de slots por clic/arrastre ===
   onSlotMouseDown(dayIndex: number, slotIndex: number) {
     const slot = this.days[dayIndex].slots[slotIndex];
-    if (slot.estado === 'ocupado' || slot.estado === 'pasado' || slot.estado === 'propio') return;
+    if (
+      slot.estado === 'ocupado' ||
+      slot.estado === 'pasado' ||
+      slot.estado === 'propio'
+    )
+      return;
 
     this.isDragging = false;
     this.isSelecting = true;
@@ -336,9 +342,17 @@ export class ReservaCamionetaPage implements OnInit, OnDestroy {
     }
 
     const slot = this.days[dayIndex].slots[slotIndex];
-    if (slot.estado === 'ocupado' || slot.estado === 'pasado' || slot.estado === 'propio') {
-      if (slot.estado === 'ocupado' && slot.reservadoPor) {
-        this.mostrarInfoReserva(slot.reservadoPor);
+    if (
+      slot.estado === 'ocupado' ||
+      slot.estado === 'pasado' ||
+      slot.estado === 'propio'
+    ) {
+      if (slot.estado === 'ocupado' && slot.reserva) {
+        if (this.permisos.puedeEliminarReservaTodos()) {
+          this.mostrarOpcionesReservaTercero(slot.reserva);
+        } else if (slot.reservadoPor) {
+          this.mostrarInfoReserva(slot.reservadoPor);
+        }
       } else if (slot.estado === 'propio' && slot.reserva) {
         this.mostrarOpcionesReservaPropia(slot.reserva);
       }
@@ -411,7 +425,11 @@ export class ReservaCamionetaPage implements OnInit, OnDestroy {
 
     for (let i = start; i <= end; i++) {
       const slot = this.days[dayIndex].slots[i];
-        if (slot.estado !== 'ocupado' && slot.estado !== 'pasado' && slot.estado !== 'propio') {
+      if (
+        slot.estado !== 'ocupado' &&
+        slot.estado !== 'pasado' &&
+        slot.estado !== 'propio'
+      ) {
         this.selectedSlots.add(`${dayIndex}-${i}`);
       }
     }
@@ -422,7 +440,12 @@ export class ReservaCamionetaPage implements OnInit, OnDestroy {
   private refreshSlotStates() {
     this.days.forEach((day, dIdx) => {
       day.slots.forEach((slot, sIdx) => {
-        if (slot.estado === 'ocupado' || slot.estado === 'pasado' || slot.estado === 'propio') return;
+        if (
+          slot.estado === 'ocupado' ||
+          slot.estado === 'pasado' ||
+          slot.estado === 'propio'
+        )
+          return;
         const key = `${dIdx}-${sIdx}`;
         slot.estado = this.selectedSlots.has(key)
           ? 'seleccionado'
@@ -439,7 +462,9 @@ export class ReservaCamionetaPage implements OnInit, OnDestroy {
   }
 
   async mostrarOpcionesReservaPropia(reserva: Reserva) {
-    const rInicio = reserva.hora_inicio ? reserva.hora_inicio.substring(0, 5) : '';
+    const rInicio = reserva.hora_inicio
+      ? reserva.hora_inicio.substring(0, 5)
+      : '';
     const rFin = reserva.hora_fin ? reserva.hora_fin.substring(0, 5) : '';
     const alert = await this.alertController.create({
       header: 'Tu Reserva',
@@ -453,7 +478,7 @@ export class ReservaCamionetaPage implements OnInit, OnDestroy {
           role: 'destructive',
           cssClass: 'alert-button-danger',
           handler: () => {
-            this.eliminarReservaPropia(reserva.id);
+            this.eliminarReserva(reserva.id);
           },
         },
       ],
@@ -461,8 +486,36 @@ export class ReservaCamionetaPage implements OnInit, OnDestroy {
     await alert.present();
   }
 
-  async eliminarReservaPropia(id: number) {
-    const loading = await this.loadingController.create({ message: 'Eliminando reserva...' });
+  async mostrarOpcionesReservaTercero(reserva: Reserva) {
+    const rInicio = reserva.hora_inicio
+      ? reserva.hora_inicio.substring(0, 5)
+      : '';
+    const rFin = reserva.hora_fin ? reserva.hora_fin.substring(0, 5) : '';
+    const owner = reserva.user?.name || 'otro usuario';
+
+    const alert = await this.alertController.create({
+      header: 'Reserva de Usuario',
+      message: `📋 ${owner} | ${reserva.camioneta?.nombre || 'Camioneta'} | ${reserva.fecha.substring(0, 10)} | ${rInicio} - ${rFin}`,
+      buttons: [
+        { text: 'Cerrar', role: 'cancel' },
+        {
+          text: 'Eliminar',
+          role: 'destructive',
+          cssClass: 'alert-button-danger',
+          handler: () => {
+            this.eliminarReserva(reserva.id);
+          },
+        },
+      ],
+    });
+
+    await alert.present();
+  }
+
+  async eliminarReserva(id: number) {
+    const loading = await this.loadingController.create({
+      message: 'Eliminando reserva...',
+    });
     await loading.present();
     this.apiService.deleteReserva(id).subscribe({
       next: async () => {

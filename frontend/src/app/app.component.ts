@@ -21,6 +21,7 @@ import {
 import { AuthService } from './services/auth.service';
 import { PermisosService } from './services/permisos.service';
 import { VersionCheckService } from './services/version-check.service';
+import { Capacitor } from '@capacitor/core';
 
 @Component({
   selector: 'app-root',
@@ -48,6 +49,7 @@ import { VersionCheckService } from './services/version-check.service';
 })
 export class AppComponent {
   user: any = null;
+  readonly isNativeApp = Capacitor.isNativePlatform();
 
   private allMenuItems = [
     {
